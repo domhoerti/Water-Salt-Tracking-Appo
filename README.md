@@ -22,8 +22,10 @@ braucht kein Konto und keine Verbindung nach außen.
 - **Freie Menge** — für alles Krumme (320 ml Glas, Suppe, was auch immer).
 - **Alle Mengen anpassbar** — Bezeichnung, Menge und „× pro Tag" pro Kachel,
   eigene Kacheln, beide Tagesziele.
-- **Verlauf** — Tag zurückblättern, 7-Tage-Streifen mit je einem Balken für
-  Wasser und Salz, Wochenschnitt.
+- **Verlauf und Planung** — bis zu 31 Tage vor- und beliebig weit zurückblättern.
+  Künftige Tage sind mit `geplant · in n Tagen` gekennzeichnet, ein Tipp auf
+  `↩ heute` springt zurück. 7-Tage-Streifen mit je einem Balken für Wasser und
+  Salz, dazu der Wochenschnitt.
 
 ## Aufs iPhone bringen
 
