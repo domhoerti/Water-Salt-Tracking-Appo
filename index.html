@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Tages-Tracker für Trinkmenge und Salz">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Wasser & Salz">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#eef1f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1113" media="(prefers-color-scheme: dark)">
+<style>
+html{color-scheme:light dark}
+body{margin:0;font:14px system-ui,-apple-system,sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Wasser &amp; Salz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#eef1f2; --surface:#ffffff; --surface-2:#f6f8f8;
+  --ink:#12181b; --muted:#5b696f; --faint:#8b979c;
+  --line:#dbe1e3; --line-strong:#c3cccf;
+  --water:#0d7b8b; --water-soft:#d3e9ec; --water-ink:#0a5b67;
+  --salt:#b5721a; --salt-soft:#f0e2cd; --salt-ink:#8a5510;
+  --ok:#2c7a4f;
+  --shadow:0 1px 2px rgba(18,24,27,.06);
+  --on-accent:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0d1113; --surface:#161c1f; --surface-2:#1c2427;
+    --ink:#e7edef; --muted:#96a3a8; --faint:#6d7a7f;
+    --line:#252e32; --line-strong:#364247;
+    --water:#45b8c6; --water-soft:#153b42; --water-ink:#8ed6df;
+    --salt:#dfa249; --salt-soft:#3a2b13; --salt-ink:#f0c383;
+    --ok:#57b77f;
+    --shadow:none;
+    --on-accent:#08191c;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0d1113; --surface:#161c1f; --surface-2:#1c2427;
+  --ink:#e7edef; --muted:#96a3a8; --faint:#6d7a7f;
+  --line:#252e32; --line-strong:#364247;
+  --water:#45b8c6; --water-soft:#153b42; --water-ink:#8ed6df;
+  --salt:#dfa249; --salt-soft:#3a2b13; --salt-ink:#f0c383;
+  --ok:#57b77f;
+  --shadow:none;
+  --on-accent:#08191c;
+}
+
+*{box-sizing:border-box}
+button,.tile,.wday,.tl-row,summary{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+input{font-size:16px}  /* unter 16px zoomt iOS beim Fokus hinein */
+body{
+  background:var(--ground); color:var(--ink);
+  font:400 15px/1.5 "IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:620px;margin:0 auto;padding:18px 16px calc(96px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{margin:0;font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-weight:600;text-wrap:balance}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--faint);font-weight:600}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--water);outline-offset:2px;border-radius:4px}
+input{font:inherit;color:inherit}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+/* ---------- header ---------- */
+header{display:flex;flex-direction:column;gap:12px}
+.masthead{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.masthead h1{font-size:20px;letter-spacing:-.01em}
+.datenav{display:flex;align-items:center;gap:8px}
+.datenav button{
+  background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  width:34px;height:34px;display:grid;place-items:center;line-height:1;color:var(--muted);
+}
+.datenav button:hover{border-color:var(--line-strong);color:var(--ink)}
+.datenav button[disabled]{opacity:.35;cursor:default}
+.datenav .day{flex:1;text-align:center;font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:17px}
+.datenav .day small{display:block;font-family:"IBM Plex Mono",monospace;font-weight:400;font-size:11px;color:var(--faint);letter-spacing:.04em}
+
+/* ---------- gauges ---------- */
+.gauge{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.gauge__top{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.gauge__fig{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;font-size:34px;line-height:.95;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.gauge--water .gauge__fig{color:var(--water)}
+.gauge--salt .gauge__fig{color:var(--salt)}
+.gauge__of{font-size:13px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+.gauge__note{font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.gauge__note b{font-weight:500;color:var(--ink)}
+
+/* Messzylinder-Skala */
+.meter{position:relative;height:34px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface-2);overflow:hidden}
+.meter__fill{position:absolute;inset:0 auto 0 0;width:0;transition:width .28s ease}
+.gauge--water .meter__fill{background:var(--water-soft)}
+.gauge--salt .meter__fill{background:var(--salt-soft)}
+.meter__edge{position:absolute;top:0;bottom:0;width:2px;transition:left .28s ease}
+.gauge--water .meter__edge{background:var(--water)}
+.gauge--salt .meter__edge{background:var(--salt)}
+.meter__ticks{position:absolute;inset:0}
+.meter__ticks i{position:absolute;top:0;width:1px;background:var(--line-strong);height:8px}
+.meter__ticks i.major{height:100%;opacity:.55}
+.meter__scale{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);letter-spacing:.03em}
+.over{color:var(--salt)}
+
+.saltrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.saltinput{display:flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:8px;padding:6px 10px}
+.saltinput input{width:74px;border:0;background:transparent;font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:500;text-align:right}
+.saltinput input:focus{outline:none}
+.saltinput span{color:var(--muted);font-size:13px}
+.stepbtn{background:var(--surface);border:1px solid var(--line);border-radius:8px;height:38px;padding:0 12px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+.stepbtn:hover{border-color:var(--line-strong);color:var(--ink)}
+.hint{font-size:12.5px;color:var(--muted)}
+
+/* ---------- Kacheln ---------- */
+.sect{display:flex;flex-direction:column;gap:10px}
+.secthead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px}
+.tile{
+  position:relative;background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  padding:11px 10px 10px;text-align:left;display:flex;flex-direction:column;gap:3px;
+  min-height:74px;box-shadow:var(--shadow);transition:transform .08s ease,border-color .12s ease;
+}
+.tile:hover{border-color:var(--water)}
+.tile:active{transform:scale(.975)}
+.tile__label{font-size:12.5px;font-weight:500;line-height:1.25;padding-right:18px}
+.tile__ml{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--water);font-weight:500;margin-top:auto}
+.tile__count{position:absolute;top:8px;right:8px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;padding:1px 5px;border-radius:20px;background:var(--surface-2);color:var(--faint);border:1px solid var(--line)}
+.tile__count.hit{background:var(--water-soft);color:var(--water-ink);border-color:transparent}
+.tile.flash{animation:flash .5s ease}
+@keyframes flash{0%{background:var(--water-soft)}100%{background:var(--surface)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.freeform{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--surface);border:1px dashed var(--line-strong);border-radius:10px;padding:9px 10px}
+.freeform input[type=number]{width:88px}
+.freeform input{background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:8px 9px}
+.freeform input[type=text]{flex:1;min-width:120px}
+.btn{background:var(--water);color:var(--on-accent);border:0;border-radius:7px;padding:9px 14px;font-weight:500;font-size:14px}
+.btn--ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.btn--ghost:hover{color:var(--ink);border-color:var(--line-strong)}
+.btn--danger{background:transparent;color:var(--salt);border:1px solid var(--line)}
+
+/* ---------- Zeitleiste ---------- */
+.timeline{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.tl-row{display:flex;align-items:center;gap:12px;padding:10px 13px;border-top:1px solid var(--line);width:100%;background:transparent;border-left:0;border-right:0;border-bottom:0;text-align:left}
+.tl-row:first-child{border-top:0}
+.tl-row:hover{background:var(--surface-2)}
+.tl-time{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted);width:44px;flex:none}
+.tl-label{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-ml{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--water);font-weight:500}
+.tl-empty{padding:20px 14px;color:var(--faint);font-size:13.5px;text-align:center}
+.tl-sum{display:flex;justify-content:space-between;padding:9px 13px;border-top:1px solid var(--line);background:var(--surface-2);font-size:12.5px;color:var(--muted)}
+.tl-edit{display:flex;gap:7px;padding:10px 13px;border-top:1px solid var(--line);background:var(--surface-2);flex-wrap:wrap;align-items:center}
+.tl-edit input{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 8px;font-family:"IBM Plex Mono",monospace;font-size:13px}
+.tl-edit input[type=number]{width:78px}
+.tl-edit .grow{flex:1;min-width:60px}
+
+/* ---------- Woche ---------- */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.wday{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:8px 4px 7px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.wday.is-current{border-color:var(--water)}
+.wday__d{font-size:10.5px;color:var(--faint);letter-spacing:.05em;text-transform:uppercase;font-weight:600}
+.wbars{display:flex;gap:3px;align-items:flex-end;height:38px}
+.wbar{width:7px;border-radius:2px;background:var(--surface-2);position:relative;height:100%;overflow:hidden}
+.wbar i{position:absolute;left:0;right:0;bottom:0;display:block}
+.wbar.w i{background:var(--water)}
+.wbar.s i{background:var(--salt)}
+.wday__n{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint)}
+
+/* ---------- Einstellungen ---------- */
+details.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+details.panel>summary{padding:13px 14px;cursor:pointer;font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.panel>summary::-webkit-details-marker{display:none}
+details.panel>summary::after{content:"+";color:var(--faint);font-family:"IBM Plex Mono",monospace}
+details.panel[open]>summary::after{content:"–"}
+.panel__body{padding:0 14px 14px;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:14px}
+.field{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.field label{font-size:13.5px;color:var(--muted)}
+.field input{background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:7px 9px;width:110px;text-align:right;font-family:"IBM Plex Mono",monospace}
+.prow{display:flex;gap:6px;align-items:center}
+.prow input[type=text]{flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-size:13.5px}
+.prow input[type=number]{width:74px;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:7px 8px;text-align:right;font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+.prow .x{background:transparent;border:1px solid var(--line);border-radius:7px;width:32px;height:33px;color:var(--faint);flex:none}
+.prow .x:hover{color:var(--salt);border-color:var(--salt)}
+.subhead{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.rowlbl{display:flex;gap:6px;font-size:10.5px;color:var(--faint);font-family:"IBM Plex Mono",monospace}
+.rowlbl span:nth-child(1){flex:1}
+.rowlbl span:nth-child(2){width:74px;text-align:right}
+.rowlbl span:nth-child(3){width:74px;text-align:right}
+.rowlbl span:nth-child(4){width:32px}
+
+/* ---------- Statuszeile / Toast ---------- */
+.banner{background:var(--salt-soft);color:var(--salt-ink);border:1px solid transparent;border-radius:10px;padding:10px 12px;font-size:13px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.banner button{background:transparent;border:1px solid currentColor;border-radius:6px;padding:4px 9px;font-size:12.5px;color:inherit;opacity:.85}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--ground);border-radius:10px;padding:10px 12px;display:flex;gap:12px;align-items:center;font-size:13.5px;box-shadow:0 6px 20px rgba(0,0,0,.22);z-index:20;max-width:min(560px,calc(100vw - 32px))}
+.toast[hidden]{display:none!important}
+.toast button{background:transparent;border:0;color:var(--water);font-weight:600;text-decoration:underline;padding:0;font-size:13.5px}
+.foot{font-size:11.5px;color:var(--faint);text-align:center;line-height:1.6}
+.sync{font-size:11px;color:var(--faint);font-family:"IBM Plex Mono",monospace}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="masthead">
+      <h1>Wasser &amp; Salz</h1>
+      <span class="sync" id="sync">lokal</span>
+    </div>
+    <div class="datenav">
+      <button id="prevDay" aria-label="Vorheriger Tag">‹</button>
+      <div class="day"><span id="dayName">–</span><small id="dayIso">–</small></div>
+      <button id="nextDay" aria-label="Nächster Tag">›</button>
+    </div>
+  </header>
+
+  <div id="banner" hidden class="banner">
+    <span>Trag zuerst deine Tagesziele ein – dann stimmen die Skalen.</span>
+    <button id="bannerGo">Ziele setzen</button>
+  </div>
+
+  <section class="gauge gauge--water">
+    <div class="gauge__top">
+      <div><span class="eyebrow">Wasser gesamt</span>
+        <div class="gauge__fig"><span id="wNow">0</span> <span class="gauge__of" id="wOf">/ 0 ml</span></div>
+      </div>
+    </div>
+    <div class="meter" id="wMeter">
+      <div class="meter__fill" id="wFill"></div>
+      <div class="meter__edge" id="wEdge" style="left:0"></div>
+      <div class="meter__ticks" id="wTicks"></div>
+    </div>
+    <div class="meter__scale"><span>0</span><span id="wHalf">–</span><span id="wMax">–</span></div>
+    <div class="gauge__note"><span id="wRest">–</span><span id="wLast"></span></div>
+  </section>
+
+  <section class="gauge gauge--salt">
+    <div class="gauge__top">
+      <div style="flex:1">
+        <span class="eyebrow">Salz für den Tag · früh abgewogen</span>
+        <div class="saltrow" style="margin-top:6px">
+          <div class="saltinput">
+            <input id="saltIn" type="text" inputmode="decimal" autocomplete="off" placeholder="0,0" aria-label="Salz in Gramm">
+            <span>g</span>
+          </div>
+          <button class="stepbtn" data-salt="-1">−1</button>
+          <button class="stepbtn" data-salt="1">+1</button>
+        </div>
+      </div>
+    </div>
+    <div class="meter" id="sMeter">
+      <div class="meter__fill" id="sFill"></div>
+      <div class="meter__edge" id="sEdge" style="left:0"></div>
+      <div class="meter__ticks" id="sTicks"></div>
+    </div>
+    <div class="gauge__note"><span id="sRest">–</span><span id="sNa" class="mono"></span></div>
+  </section>
+
+  <section class="sect">
+    <div class="secthead"><h2 style="font-size:15px">Schnell loggen</h2><span class="hint">Tippen = mit Uhrzeit eintragen</span></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="freeform">
+      <input id="ffMl" type="number" inputmode="numeric" min="1" placeholder="ml">
+      <input id="ffLabel" type="text" placeholder="Bezeichnung (z. B. Glas Wasser)" list="ffList">
+      <datalist id="ffList"></datalist>
+      <button class="btn" id="ffAdd">Eintragen</button>
+    </div>
+  </section>
+
+  <section class="sect">
+    <div class="secthead"><h2 style="font-size:15px">Zeitleiste</h2><span class="hint">Eintrag antippen zum Korrigieren</span></div>
+    <div class="timeline" id="timeline"></div>
+  </section>
+
+  <section class="sect">
+    <div class="secthead"><h2 style="font-size:15px">Letzte 7 Tage</h2><span class="hint mono" id="weekAvg"></span></div>
+    <div class="week" id="week"></div>
+  </section>
+
+  <details class="panel" id="settings">
+    <summary>Einstellungen &amp; Export</summary>
+    <div class="panel__body">
+      <div>
+        <div class="subhead" style="margin-bottom:8px">Tagesziele</div>
+        <div class="field"><label for="tW">Wasser pro Tag</label><input id="tW" type="number" inputmode="numeric" min="0" step="100"> </div>
+        <div class="field" style="margin-top:8px"><label for="tS">Salz pro Tag (g)</label><input id="tS" type="number" inputmode="decimal" min="0" step="0.5"></div>
+      </div>
+      <div>
+        <div class="subhead" style="margin-bottom:8px">Mengen &amp; Kacheln</div>
+        <div class="rowlbl"><span>Bezeichnung</span><span>ml</span><span>× / Tag</span><span></span></div>
+        <div id="presetRows" style="display:flex;flex-direction:column;gap:6px;margin-top:6px"></div>
+        <button class="btn btn--ghost" id="addPreset" style="margin-top:8px">+ Kachel hinzufügen</button>
+      </div>
+      <div>
+        <div class="subhead" style="margin-bottom:8px">Export</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn--ghost" id="csvEntries">Einträge als CSV</button>
+          <button class="btn btn--ghost" id="csvDays">Tagesübersicht als CSV</button>
+        </div>
+        <p class="hint" style="margin:8px 0 0">Semikolon-getrennt, direkt in Google Sheets importierbar (Datei › Importieren).</p>
+      </div>
+      <div>
+        <div class="subhead" style="margin-bottom:8px">Sicherung</div>
+        <p class="hint" style="margin:0 0 8px">Deine Daten liegen nur auf diesem Gerät. Sichere sie ab und zu – dann geht nichts verloren, wenn das iPhone mal neu aufgesetzt wird.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn--ghost" id="backupSave">Sicherung speichern</button>
+          <button class="btn btn--ghost" id="backupLoad">Sicherung einlesen</button>
+          <button class="btn btn--ghost" id="csvLoad">Einträge-CSV einlesen</button>
+        </div>
+        <input id="fileIn" type="file" accept=".json,.csv,text/csv,application/json" hidden>
+      </div>
+    </div>
+  </details>
+
+  <div id="installTip" hidden class="banner" style="background:var(--water-soft);color:var(--water-ink)">
+    <span>Als App installieren: unten auf <b>Teilen</b> tippen, dann <b>Zum Home-Bildschirm</b>.</span>
+    <button id="installDismiss">Verstanden</button>
+  </div>
+
+  <p class="foot" id="foot">Salz → Natrium mit Faktor 0,393 (NaCl). Wasser aus Reis und Porridge zählt mit.<br><span id="ver"></span></p>
+</div>
+
+<div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="toastUndo">Rückgängig</button></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var APP_VERSION = "1.0";
+
+  /* ================= Modell ================= */
+  var DEFAULTS = {
+    targetWater: 4000,
+    targetSalt: 10,
+    targetsSet: false,
+    presets: [
+      {id:"shake",    label:"Shake",              ml:700, perDay:0},
+      {id:"drink",    label:"Monster / Cola Zero",ml:500, perDay:0},
+      {id:"glass",    label:"Glas Wasser",        ml:330, perDay:0},
+      {id:"doppio",   label:"Doppio",             ml:80,  perDay:0},
+      {id:"espresso", label:"Espresso",           ml:30,  perDay:0},
+      {id:"porridge", label:"Porridge",           ml:250, perDay:2},
+      {id:"rice",     label:"Reis",               ml:150, perDay:1}
+    ]
+  };
+
+  var cfg = null;
+  var dayCache = {};
+  var cur = isoToday();
+  var db = null;
+  var unsubDay = null;
+  var editingId = null;
+  var lastUndo = null, toastTimer = null;
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* --------- kleine Helfer --------- */
+  function isoToday(){ return toIso(new Date()); }
+  function toIso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function fromIso(s){ var p=String(s).split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+  function shiftIso(s,n){ var d=fromIso(s); d.setDate(d.getDate()+n); return toIso(d); }
+  function nf(n){ return Math.round(Number(n)||0).toLocaleString("de-AT"); }
+  function nf1(n){ return (Math.round((Number(n)||0)*10)/10).toLocaleString("de-AT",{minimumFractionDigits:1,maximumFractionDigits:1}); }
+  function hhmm(ts){ var d=new Date(ts); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+  function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+  function byTs(a,b){ return a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0; }
+  function emptyDay(date){ return {date:date, saltG:null, entries:[]}; }
+
+  /* Snapshots aus der db sind eingefroren – NIE direkt verwenden, immer kopieren. */
+  function clone(o){
+    if(o == null) return null;
+    try{ return structuredClone(o); }
+    catch(e){ try{ return JSON.parse(JSON.stringify(o)); }catch(e2){ return null; } }
+  }
+  function normDay(date, raw){
+    var d = clone(raw) || {};
+    var list = Array.isArray(d.entries) ? d.entries : [];
+    return {
+      date: date,
+      saltG: (typeof d.saltG === "number" && isFinite(d.saltG)) ? d.saltG : null,
+      entries: list.filter(function(e){ return e && e.ts; }).map(function(e){
+        return {
+          id: String(e.id || uid()),
+          label: String(e.label == null ? "Wasser" : e.label),
+          ml: Math.max(0, Math.round(Number(e.ml)||0)),
+          ts: String(e.ts),
+          preset: e.preset == null ? null : String(e.preset)
+        };
+      }).sort(byTs)
+    };
+  }
+  function normCfg(raw){
+    var c = clone(raw) || {};
+    var ps = (Array.isArray(c.presets) ? c.presets : []).filter(function(p){ return p && p.label != null; }).map(function(p){
+      return {
+        id: String(p.id || uid()),
+        label: String(p.label),
+        ml: Math.max(0, Math.round(Number(p.ml)||0)),
+        perDay: Math.max(0, Math.round(Number(p.perDay)||0))
+      };
+    });
+    return {
+      targetWater: Math.max(0, Math.round(Number(c.targetWater)||0)),
+      targetSalt: Math.max(0, Math.round((Number(c.targetSalt)||0)*10)/10),
+      targetsSet: !!c.targetsSet,
+      presets: ps.length ? ps : clone(DEFAULTS.presets)
+    };
+  }
+  /* Immer ein beschreibbares Tagesobjekt zurückgeben. */
+  function day(date){
+    var d = dayCache[date];
+    if(!d || !Array.isArray(d.entries) || Object.isFrozen(d) || Object.isFrozen(d.entries)){
+      d = normDay(date, d);
+      dayCache[date] = d;
+    }
+    return d;
+  }
+  function sumMl(d){ return (d && d.entries ? d.entries : []).reduce(function(a,e){ return a + (Number(e.ml)||0); }, 0); }
+
+  /* Fehlerfangnetz: ein kaputter Handler darf nie stumm sterben. */
+  function safe(fn){
+    return function(ev){
+      try{ return fn(ev); }
+      catch(err){
+        console.error(err);
+        showToast("Fehler: " + ((err && err.message) || "unbekannt"));
+      }
+    };
+  }
+
+  /* ================= Speichern ================= */
+  var LS_CFG = "ws.cfg", LS_DAY = "ws.day.", LS_IDX = "ws.idx";
+  function lsGet(k){ try{ var v=localStorage.getItem(k); return v?JSON.parse(v):null; }catch(e){ return null; } }
+  function lsSet(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  function lsIndex(){ var v = lsGet(LS_IDX); return Array.isArray(v) ? v : []; }
+  function lsTouch(date){ var idx = lsIndex(); if(idx.indexOf(date) === -1){ idx.push(date); idx.sort(); lsSet(LS_IDX, idx); } }
+
+  function setSync(t){ var el = $("sync"); if(el) el.textContent = t; }
+  function noteErr(e){ setSync(e && e.code === "quota_exceeded" ? "Speicher voll" : "nur lokal"); }
+
+  function saveCfg(){
+    lsSet(LS_CFG, cfg);
+    if(db) db.doc("settings/config").set(clone(cfg)).catch(noteErr);
+  }
+  function saveDay(date){
+    var d = day(date);
+    lsSet(LS_DAY+date, d); lsTouch(date);
+    if(db) db.doc("days/"+date).set(clone(d)).catch(noteErr);
+  }
+
+  function loadLocal(){
+    cfg = normCfg(lsGet(LS_CFG) || DEFAULTS);
+    lsIndex().forEach(function(date){
+      var d = lsGet(LS_DAY+date);
+      if(d) dayCache[date] = normDay(date, d);
+    });
+  }
+
+  /* Eigenständige App: alles bleibt auf diesem Gerät. */
+  function connect(){ setSync("auf diesem Gerät"); }
+  function watchDay(){}
+
+  /* ================= Aktionen ================= */
+  function logDrink(label, ml, presetId){
+    var d = day(cur);
+    var when;
+    if(cur === isoToday()){
+      when = new Date();
+    } else {
+      when = fromIso(cur);
+      when.setHours(12, Math.min(59, d.entries.length), 0, 0);
+    }
+    var entry = {id:uid(), label:String(label), ml:Math.max(0, Math.round(Number(ml)||0)), ts:when.toISOString(), preset:presetId||null};
+    d.entries.push(entry);
+    d.entries.sort(byTs);
+    saveDay(cur);
+    lastUndo = {date:cur, id:entry.id};
+    showToast(entry.label + " · " + nf(entry.ml) + " ml um " + hhmm(entry.ts));
+    render();
+  }
+  function removeEntry(date, id){
+    var d = day(date);
+    d.entries = d.entries.filter(function(e){ return e.id !== id; });
+    saveDay(date); render();
+  }
+  function showToast(msg){
+    var t = $("toast");
+    $("toastMsg").textContent = msg;
+    $("toastUndo").hidden = !lastUndo;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.hidden = true; lastUndo = null; }, 6000);
+  }
+
+  /* ================= Rendern ================= */
+  var WD  = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+  var WDS = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+  var MON = ["Jän","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+
+  function renderHeader(){
+    var d = fromIso(cur), t = isoToday();
+    var name = cur === t ? "Heute" : cur === shiftIso(t,-1) ? "Gestern" : WD[d.getDay()];
+    $("dayName").textContent = name;
+    $("dayIso").textContent = WDS[d.getDay()]+" "+d.getDate()+". "+MON[d.getMonth()]+" "+d.getFullYear();
+    $("nextDay").disabled = cur >= t;
+  }
+
+  function drawTicks(el, target, step){
+    el.innerHTML = "";
+    if(!(target > 0) || !(step > 0)) return;
+    var n = Math.floor(target/step);
+    if(n > 40) return;
+    for(var i=1;i<=n;i++){
+      var pos = (i*step)/target*100;
+      if(pos >= 99.6) continue;
+      var b = document.createElement("i");
+      b.style.left = pos+"%";
+      if(i % 2 === 0) b.className = "major";
+      el.appendChild(b);
+    }
+  }
+
+  function renderGauges(){
+    var d = day(cur);
+    var total = sumMl(d);
+    var tw = cfg.targetWater;
+
+    $("wNow").textContent = nf(total);
+    $("wOf").textContent = "/ " + (tw ? nf(tw) : "–") + " ml";
+    var pct = tw ? Math.min(100, total/tw*100) : 0;
+    $("wFill").style.width = pct+"%";
+    $("wEdge").style.left = "calc("+pct+"% - 1px)";
+    drawTicks($("wTicks"), tw, 500);
+    $("wHalf").textContent = tw ? nf(tw/2) : "";
+    $("wMax").textContent  = tw ? nf(tw)+" ml" : "";
+    var rest = tw - total;
+    var wr = $("wRest");
+    wr.className = rest < 0 ? "over" : "";
+    wr.textContent = !tw ? "kein Ziel gesetzt"
+      : rest > 0 ? "noch " + nf(rest) + " ml"
+      : "Ziel erreicht" + (rest < 0 ? " · " + nf(-rest) + " ml darüber" : "");
+    var last = d.entries.length ? d.entries[d.entries.length-1] : null;
+    var wl = $("wLast");
+    wl.textContent = "";
+    if(last){
+      var b = document.createElement("b"); b.textContent = hhmm(last.ts);
+      wl.appendChild(document.createTextNode("zuletzt "));
+      wl.appendChild(b);
+      wl.appendChild(document.createTextNode(" · " + last.label));
+    }
+
+    var ts = cfg.targetSalt;
+    var s = d.saltG;
+    var si = $("saltIn");
+    if(document.activeElement !== si) si.value = (s == null ? "" : String(s).replace(".", ","));
+    var sp = (ts && s) ? Math.min(100, s/ts*100) : 0;
+    $("sFill").style.width = sp+"%";
+    $("sEdge").style.left = "calc("+sp+"% - 1px)";
+    drawTicks($("sTicks"), ts, 1);
+    var sr = $("sRest");
+    var diff = ts - (s||0);
+    sr.className = diff < 0 ? "over" : "";
+    sr.textContent = !ts ? "kein Ziel gesetzt"
+      : s == null ? "noch nichts eingetragen · Ziel " + nf1(ts) + " g"
+      : diff > 0 ? "noch " + nf1(diff) + " g"
+      : "Ziel erreicht" + (diff < 0 ? " · " + nf1(-diff) + " g darüber" : "");
+    $("sNa").textContent = s ? nf1(s*0.393) + " g Natrium" : "";
+  }
+
+  function renderTiles(){
+    var box = $("tiles");
+    var d = day(cur);
+    box.innerHTML = "";
+    cfg.presets.forEach(function(p){
+      var used = d.entries.filter(function(e){ return e.preset === p.id; }).length;
+      var b = document.createElement("button");
+      b.className = "tile"; b.type = "button";
+
+      if(p.perDay > 0 || used > 0){
+        var c = document.createElement("span");
+        c.className = "tile__count" + ((p.perDay > 0 ? used >= p.perDay : true) ? " hit" : "");
+        c.textContent = p.perDay > 0 ? (used + "/" + p.perDay) : (used + "×");
+        b.appendChild(c);
+      }
+      var lab = document.createElement("span"); lab.className = "tile__label"; lab.textContent = p.label;
+      var ml  = document.createElement("span"); ml.className  = "tile__ml";    ml.textContent  = nf(p.ml) + " ml";
+      b.appendChild(lab); b.appendChild(ml);
+
+      b.addEventListener("click", safe(function(){
+        logDrink(p.label, p.ml, p.id);
+        var fresh = box.children[cfg.presets.indexOf(p)];
+        if(fresh){ fresh.classList.add("flash"); }
+      }));
+      box.appendChild(b);
+    });
+
+    var dl = $("ffList");
+    dl.innerHTML = "";
+    cfg.presets.forEach(function(p){ var o=document.createElement("option"); o.value=p.label; dl.appendChild(o); });
+  }
+
+  function renderTimeline(){
+    var tl = $("timeline");
+    var d = day(cur);
+    tl.innerHTML = "";
+    if(!d.entries.length){
+      var e = document.createElement("div");
+      e.className = "tl-empty";
+      e.textContent = "Noch nichts geloggt. Kachel antippen – die Uhrzeit setzt sich selbst.";
+      tl.appendChild(e);
+      return;
+    }
+    d.entries.forEach(function(en){
+      var row = document.createElement("button");
+      row.className = "tl-row"; row.type = "button";
+      var t = document.createElement("span"); t.className="tl-time"; t.textContent = hhmm(en.ts);
+      var l = document.createElement("span"); l.className="tl-label"; l.textContent = en.label;
+      var m = document.createElement("span"); m.className="tl-ml"; m.textContent = nf(en.ml) + " ml";
+      row.appendChild(t); row.appendChild(l); row.appendChild(m);
+      row.addEventListener("click", safe(function(){
+        editingId = (editingId === en.id ? null : en.id);
+        renderTimeline();
+      }));
+      tl.appendChild(row);
+      if(editingId === en.id) tl.appendChild(editor(en));
+    });
+    var sum = document.createElement("div");
+    sum.className = "tl-sum";
+    var a = document.createElement("span"); a.textContent = d.entries.length + (d.entries.length === 1 ? " Eintrag" : " Einträge");
+    var b2 = document.createElement("span"); b2.className = "mono"; b2.textContent = nf(sumMl(d)) + " ml";
+    sum.appendChild(a); sum.appendChild(b2);
+    tl.appendChild(sum);
+  }
+
+  function editor(en){
+    var box = document.createElement("div");
+    box.className = "tl-edit";
+    var ml = document.createElement("input"); ml.type="number"; ml.min="0"; ml.value=en.ml; ml.inputMode="numeric";
+    var tm = document.createElement("input"); tm.type="time"; tm.value=hhmm(en.ts);
+    var lb = document.createElement("input"); lb.type="text"; lb.className="grow"; lb.value=en.label;
+    var ok = document.createElement("button"); ok.type="button"; ok.className="btn"; ok.textContent="Sichern";
+    var rm = document.createElement("button"); rm.type="button"; rm.className="btn btn--danger"; rm.textContent="Löschen";
+
+    ok.addEventListener("click", safe(function(){
+      var d = day(cur);
+      var target = null;
+      d.entries.forEach(function(x){ if(x.id === en.id) target = x; });
+      if(!target){ editingId = null; render(); return; }
+      target.ml = Math.max(0, Math.round(Number(ml.value)||0));
+      target.label = lb.value.trim() || target.label;
+      var parts = String(tm.value||"").split(":");
+      if(parts.length === 2 && parts[0] !== ""){
+        var nd = fromIso(cur); nd.setHours(+parts[0], +parts[1], 0, 0);
+        target.ts = nd.toISOString();
+      }
+      d.entries.sort(byTs);
+      editingId = null; lastUndo = null;
+      saveDay(cur); render();
+    }));
+    rm.addEventListener("click", safe(function(){
+      editingId = null; lastUndo = null;
+      removeEntry(cur, en.id);
+    }));
+    box.appendChild(ml); box.appendChild(tm); box.appendChild(lb); box.appendChild(ok); box.appendChild(rm);
+    return box;
+  }
+
+  function renderWeek(){
+    var box = $("week");
+    box.innerHTML = "";
+    var tw = cfg.targetWater || 1, ts = cfg.targetSalt || 1;
+    var sums = [];
+    for(var i=6;i>=0;i--){
+      var date = shiftIso(cur, -i);
+      var d = dayCache[date] || emptyDay(date);
+      var total = sumMl(d);
+      sums.push(total);
+
+      var el = document.createElement("button");
+      el.className = "wday" + (date === cur ? " is-current" : "");
+      el.type = "button";
+      var wp = Math.max(0, Math.min(100, total/tw*100));
+      var sp = Math.max(0, Math.min(100, (d.saltG||0)/ts*100));
+
+      var dn = document.createElement("span"); dn.className="wday__d"; dn.textContent = WDS[fromIso(date).getDay()];
+      var bars = document.createElement("span"); bars.className="wbars";
+      var b1 = document.createElement("span"); b1.className="wbar w"; var i1=document.createElement("i"); i1.style.height=wp+"%"; b1.appendChild(i1);
+      var b2 = document.createElement("span"); b2.className="wbar s"; var i2=document.createElement("i"); i2.style.height=sp+"%"; b2.appendChild(i2);
+      bars.appendChild(b1); bars.appendChild(b2);
+      var n = document.createElement("span"); n.className="wday__n"; n.textContent = total ? (Math.round(total/100)/10).toLocaleString("de-AT")+" l" : "–";
+      el.appendChild(dn); el.appendChild(bars); el.appendChild(n);
+
+      el.addEventListener("click", safe(function(dd){ return function(){
+        cur = dd; editingId = null; lastUndo = null; render(); watchDay();
+      }; }(date)));
+      box.appendChild(el);
+    }
+    var got = sums.filter(function(v){ return v > 0; });
+    $("weekAvg").textContent = got.length ? "Ø " + nf(got.reduce(function(a,b){return a+b;},0)/got.length) + " ml" : "";
+  }
+
+  function renderBanner(){ $("banner").hidden = !!cfg.targetsSet; }
+
+  /* Einstellungen nur neu aufbauen, wenn niemand darin tippt. */
+  function renderSettings(force){
+    var panel = $("settings");
+    if(!force && panel.contains(document.activeElement)) return;
+    $("tW").value = cfg.targetWater || "";
+    $("tS").value = cfg.targetSalt || "";
+    var box = $("presetRows");
+    box.innerHTML = "";
+    cfg.presets.forEach(function(p){
+      var row = document.createElement("div");
+      row.className = "prow";
+      var lb = document.createElement("input"); lb.type="text";   lb.value=p.label;
+      var ml = document.createElement("input"); ml.type="number"; ml.min="0"; ml.value=p.ml;        ml.inputMode="numeric";
+      var pd = document.createElement("input"); pd.type="number"; pd.min="0"; pd.value=p.perDay||0; pd.inputMode="numeric";
+      var x  = document.createElement("button"); x.className="x"; x.type="button"; x.textContent="×"; x.title="Kachel entfernen";
+
+      lb.addEventListener("change", safe(function(){ p.label = lb.value.trim() || p.label; lb.value = p.label; saveCfg(); renderTiles(); }));
+      ml.addEventListener("change", safe(function(){ p.ml = Math.max(0, Math.round(Number(ml.value)||0)); ml.value = p.ml; saveCfg(); renderTiles(); }));
+      pd.addEventListener("change", safe(function(){ p.perDay = Math.max(0, Math.round(Number(pd.value)||0)); pd.value = p.perDay; saveCfg(); renderTiles(); }));
+      x.addEventListener("click", safe(function(){
+        var k = cfg.presets.indexOf(p);
+        if(k > -1) cfg.presets.splice(k,1);
+        saveCfg(); renderTiles(); renderSettings(true);
+      }));
+
+      row.appendChild(lb); row.appendChild(ml); row.appendChild(pd); row.appendChild(x);
+      box.appendChild(row);
+    });
+    renderBanner();
+  }
+
+  function render(){ renderHeader(); renderGauges(); renderTiles(); renderTimeline(); renderWeek(); renderBanner(); }
+
+  /* ================= CSV ================= */
+  function csvCell(v){
+    var s = String(v == null ? "" : v);
+    return /[";\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }
+  function de(n){ return n == null || n === "" ? "" : String(n).replace(".", ","); }
+  function allDates(){ return Object.keys(dayCache).sort(); }
+  function csvEntries(){
+    var rows = [["Datum","Uhrzeit","Kategorie","Bezeichnung","Menge","Einheit"]];
+    allDates().forEach(function(date){
+      var d = dayCache[date];
+      d.entries.forEach(function(e){ rows.push([date, hhmm(e.ts), "Wasser", e.label, e.ml, "ml"]); });
+      if(d.saltG != null) rows.push([date, "", "Salz", "Tagesmenge", de(d.saltG), "g"]);
+    });
+    return rows;
+  }
+  function csvDays(){
+    var rows = [["Datum","Wasser_ml","Ziel_Wasser_ml","Salz_g","Ziel_Salz_g","Natrium_g","Eintraege"]];
+    allDates().forEach(function(date){
+      var d = dayCache[date], s = d.saltG;
+      rows.push([date, sumMl(d), cfg.targetWater||"", de(s),
+                 de(cfg.targetSalt||""), s == null ? "" : de(Math.round(s*0.393*100)/100),
+                 d.entries.length]);
+    });
+    return rows;
+  }
+  function saveFile(name, text, mime){
+    try{
+      var blob = new Blob([text], {type:(mime||"text/csv")+";charset=utf-8"});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = name; a.rel = "noopener";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+      showToast(name + " gespeichert.");
+    }catch(e){ showToast("Speichern fehlgeschlagen: " + e.message); }
+  }
+  function download(name, rows){
+    if(rows.length < 2){ showToast("Noch keine Daten zum Exportieren."); return; }
+    saveFile(name, "\ufeff" + rows.map(function(r){ return r.map(csvCell).join(";"); }).join("\r\n"), "text/csv");
+  }
+
+  /* ---------- Sicherung & Übernahme ---------- */
+  function backupJson(){
+    saveFile("wasser-salz-sicherung-" + isoToday() + ".json",
+      JSON.stringify({app:"wasser-salz", version:1, exportedAt:new Date().toISOString(), cfg:cfg, days:dayCache}, null, 1),
+      "application/json");
+  }
+  function applyDays(incoming, quelle){
+    var n = 0;
+    Object.keys(incoming).forEach(function(date){
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+      dayCache[date] = normDay(date, incoming[date]);
+      lsSet(LS_DAY+date, dayCache[date]); lsTouch(date); n++;
+    });
+    render(); renderSettings(true);
+    showToast(n + (n === 1 ? " Tag" : " Tage") + " aus " + quelle + " übernommen.");
+  }
+  function readJson(text){
+    var data = JSON.parse(text);
+    if(!data || !data.days) throw new Error("keine Sicherungsdatei");
+    if(!confirm("Sicherung einlesen? Tage mit gleichem Datum werden überschrieben.")) return;
+    if(data.cfg){ cfg = normCfg(data.cfg); saveCfg(); }
+    applyDays(data.days, "der Sicherung");
+  }
+  function readCsv(text){
+    var lines = text.replace(/^\ufeff/, "").split(/\r?\n/).filter(function(l){ return l.trim(); });
+    if(lines.length < 2) throw new Error("CSV ist leer");
+    var sep = (lines[0].indexOf(";") > -1) ? ";" : ",";
+    var head = lines[0].toLowerCase().split(sep).map(function(h){ return h.replace(/"/g,"").trim(); });
+    var iDate = head.indexOf("datum"), iTime = head.indexOf("uhrzeit"),
+        iKat = head.indexOf("kategorie"), iLbl = head.indexOf("bezeichnung"), iVal = head.indexOf("menge");
+    if(iDate < 0 || iVal < 0) throw new Error("Spalten Datum/Menge fehlen");
+    if(!confirm("CSV einlesen? Tage mit gleichem Datum werden überschrieben.")) return;
+    var out = {};
+    lines.slice(1).forEach(function(line){
+      var c = line.split(sep).map(function(x){ return x.replace(/^"|"$/g,"").replace(/""/g,'"').trim(); });
+      var date = c[iDate]; if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+      if(!out[date]) out[date] = {date:date, saltG:null, entries:[]};
+      var val = Number(String(c[iVal]).replace(",", "."));
+      if(!isFinite(val)) return;
+      var kat = (iKat > -1 ? c[iKat] : "Wasser").toLowerCase();
+      if(kat.indexOf("salz") === 0){ out[date].saltG = Math.round(val*10)/10; return; }
+      var hm = String(iTime > -1 ? c[iTime] : "").split(":");
+      var when = fromIso(date);
+      when.setHours(hm.length === 2 ? +hm[0] : 12, hm.length === 2 ? +hm[1] : 0, 0, 0);
+      out[date].entries.push({id:uid(), label:(iLbl > -1 && c[iLbl]) ? c[iLbl] : "Wasser",
+                              ml:Math.max(0, Math.round(val)), ts:when.toISOString(), preset:null});
+    });
+    applyDays(out, "der CSV-Datei");
+  }
+  function pickFile(handler){
+    var inp = $("fileIn");
+    inp.value = "";
+    inp.onchange = safe(function(){
+      var f = inp.files && inp.files[0];
+      if(!f) return;
+      var r = new FileReader();
+      r.onload = safe(function(){ handler(String(r.result)); });
+      r.onerror = function(){ showToast("Datei konnte nicht gelesen werden."); };
+      r.readAsText(f, "utf-8");
+    });
+    inp.click();
+  }
+
+  /* ================= Verdrahtung ================= */
+  loadLocal();
+  render();
+  renderSettings(true);
+
+  $("prevDay").addEventListener("click", safe(function(){
+    cur = shiftIso(cur,-1); editingId = null; lastUndo = null; render(); watchDay();
+  }));
+  $("nextDay").addEventListener("click", safe(function(){
+    if(cur < isoToday()){ cur = shiftIso(cur,1); editingId = null; lastUndo = null; render(); watchDay(); }
+  }));
+
+  var saltIn = $("saltIn");
+  saltIn.addEventListener("input", safe(function(){
+    // Komma und Punkt gleichwertig; alles andere fliegt raus, ohne den Cursor zu verlieren.
+    var clean = saltIn.value.replace(/[^0-9.,]/g, "");
+    var parts = clean.split(/[.,]/);
+    if(parts.length > 2) clean = parts.shift() + "," + parts.join("");
+    if(clean !== saltIn.value){
+      var pos = Math.max(0, (saltIn.selectionStart || clean.length) - 1);
+      saltIn.value = clean;
+      try{ saltIn.setSelectionRange(pos, pos); }catch(e){}
+    }
+    var v = clean.replace(",", ".");
+    var d = day(cur);
+    d.saltG = (v === "" || v === "." || isNaN(Number(v))) ? null : Math.max(0, Math.round(Number(v)*10)/10);
+    renderGauges(); renderWeek();
+  }));
+  saltIn.addEventListener("change", safe(function(){ saveDay(cur); }));
+  saltIn.addEventListener("blur", safe(function(){ saveDay(cur); renderGauges(); }));
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-salt]"), function(b){
+    b.addEventListener("click", safe(function(){
+      var d = day(cur);
+      d.saltG = Math.max(0, Math.round(((d.saltG||0) + Number(b.getAttribute("data-salt")))*10)/10);
+      lastUndo = null;
+      saveDay(cur); render();
+    }));
+  });
+
+  function addFree(){
+    var mlEl = $("ffMl"), lbEl = $("ffLabel");
+    var ml = Math.round(Number(mlEl.value)||0);
+    if(ml <= 0){ mlEl.focus(); showToast("Bitte eine Menge in ml eintragen."); return; }
+    logDrink(lbEl.value.trim() || "Wasser", ml, null);
+    mlEl.value = ""; lbEl.value = "";
+    mlEl.focus();
+  }
+  $("ffAdd").addEventListener("click", safe(addFree));
+  $("ffMl").addEventListener("keydown", safe(function(e){ if(e.key === "Enter"){ e.preventDefault(); addFree(); } }));
+  $("ffLabel").addEventListener("keydown", safe(function(e){ if(e.key === "Enter"){ e.preventDefault(); addFree(); } }));
+
+  $("toastUndo").addEventListener("click", safe(function(){
+    if(lastUndo) removeEntry(lastUndo.date, lastUndo.id);
+    lastUndo = null; $("toast").hidden = true;
+  }));
+
+  $("tW").addEventListener("change", safe(function(e){
+    cfg.targetWater = Math.max(0, Math.round(Number(e.target.value)||0));
+    cfg.targetsSet = true; saveCfg(); render();
+  }));
+  $("tS").addEventListener("change", safe(function(e){
+    cfg.targetSalt = Math.max(0, Math.round((Number(String(e.target.value).replace(",","."))||0)*10)/10);
+    cfg.targetsSet = true; saveCfg(); render();
+  }));
+  $("addPreset").addEventListener("click", safe(function(){
+    cfg.presets.push({id:uid(), label:"Neu", ml:250, perDay:0});
+    saveCfg(); renderTiles(); renderSettings(true);
+  }));
+  $("bannerGo").addEventListener("click", safe(function(){
+    $("settings").open = true;
+    $("settings").scrollIntoView({behavior:"smooth", block:"center"});
+    $("tW").focus(); $("tW").select();
+  }));
+  $("csvEntries").addEventListener("click", safe(function(){ download("wasser-salz-eintraege.csv", csvEntries()); }));
+  $("csvDays").addEventListener("click", safe(function(){ download("wasser-salz-tage.csv", csvDays()); }));
+  $("backupSave").addEventListener("click", safe(backupJson));
+  $("backupLoad").addEventListener("click", safe(function(){ pickFile(safe(readJson)); }));
+  $("csvLoad").addEventListener("click", safe(function(){ pickFile(safe(readCsv)); }));
+
+  /* Installationshinweis nur in Safari, nicht in der installierten App */
+  (function(){
+    var standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if(iOS && !standalone && !lsGet("ws.tipHidden")) $("installTip").hidden = false;
+    if(standalone) setSync("App");
+    $("installDismiss").addEventListener("click", safe(function(){ lsSet("ws.tipHidden", true); $("installTip").hidden = true; }));
+    $("ver").textContent = "Version " + APP_VERSION + " · Daten bleiben auf diesem Gerät";
+  })();
+
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("sw.js").catch(function(e){ console.warn("SW:", e); });
+    });
+  }
+
+  /* Tageswechsel über Mitternacht: beim Zurückkommen auf den echten Tag springen. */
+  document.addEventListener("visibilitychange", safe(function(){
+    if(document.hidden) return;
+    if(cur !== isoToday() && !editingId && sumMl(day(cur)) === 0 && day(cur).saltG == null){
+      cur = isoToday(); render(); watchDay();
+    } else { renderHeader(); }
+  }));
+
+  window.addEventListener("error", function(e){ console.error("[wasser-salz]", e.message); });
+
+  connect();
+})();
+</script>
+</body>
+</html>
