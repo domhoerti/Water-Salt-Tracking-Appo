@@ -202,6 +202,8 @@ details.panel[open]>summary::after{content:"–"}
 /* ---------- Statuszeile / Toast ---------- */
 .banner{background:var(--salt-soft);color:var(--salt-ink);border:1px solid transparent;border-radius:10px;padding:10px 12px;font-size:13px;display:flex;justify-content:space-between;gap:10px;align-items:center}
 .banner button{background:transparent;border:1px solid currentColor;border-radius:6px;padding:4px 9px;font-size:12.5px;color:inherit;opacity:.85}
+.banner--backup{background:var(--surface);border-color:var(--line-strong);color:var(--ink)}
+.banner--backup button{border-color:var(--water);color:var(--water);opacity:1;font-weight:500}
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--ground);border-radius:10px;padding:10px 12px;display:flex;gap:12px;align-items:center;font-size:13.5px;box-shadow:0 6px 20px rgba(0,0,0,.22);z-index:20;max-width:min(560px,calc(100vw - 32px))}
 .toast[hidden]{display:none!important}
 .toast button{background:transparent;border:0;color:var(--water);font-weight:600;text-decoration:underline;padding:0;font-size:13.5px;flex:none;white-space:nowrap}
@@ -228,6 +230,11 @@ details.panel[open]>summary::after{content:"–"}
   <div id="banner" hidden class="banner">
     <span>Trag zuerst deine Tagesziele ein – dann stimmen die Skalen.</span>
     <button id="bannerGo">Ziele setzen</button>
+  </div>
+
+  <div id="backupTip" hidden class="banner banner--backup">
+    <span id="backupTipText"></span>
+    <button id="backupNow">Jetzt sichern</button>
   </div>
 
   <section class="gauge gauge--water">
@@ -313,6 +320,11 @@ details.panel[open]>summary::after{content:"–"}
       <div>
         <div class="subhead" style="margin-bottom:8px">Sicherung</div>
         <p class="hint" style="margin:0 0 8px">Deine Daten liegen nur auf diesem Gerät. Sichere sie ab und zu – dann geht nichts verloren, wenn das iPhone mal neu aufgesetzt wird.</p>
+        <div class="field" style="margin-bottom:10px">
+          <label for="bkInt">Erinnerung alle … Tage (0 = aus)</label>
+          <input id="bkInt" type="number" min="0" max="99" step="1" inputmode="numeric">
+        </div>
+        <p class="hint" id="bkLast" style="margin:0 0 10px"></p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn--ghost" id="backupSave">Sicherung speichern</button>
           <button class="btn btn--ghost" id="backupLoad">Sicherung einlesen</button>
@@ -344,6 +356,7 @@ details.panel[open]>summary::after{content:"–"}
     targetWater: 4000,
     targetSalt: 10,
     targetsSet: false,
+    backupEveryDays: 3,
     presets: [
       {id:"shake",    label:"Shake",              ml:700, perDay:0},
       {id:"drink",    label:"Monster / Cola Zero",ml:500, perDay:0},
@@ -410,10 +423,12 @@ details.panel[open]>summary::after{content:"–"}
         perDay: Math.max(0, Math.round(Number(p.perDay)||0))
       };
     });
+    var be = Number(c.backupEveryDays);
     return {
       targetWater: Math.max(0, Math.round(Number(c.targetWater)||0)),
       targetSalt: Math.max(0, Math.round((Number(c.targetSalt)||0)*10)/10),
       targetsSet: !!c.targetsSet,
+      backupEveryDays: (isFinite(be) && be >= 0) ? Math.min(99, Math.round(be)) : 3,
       presets: ps.length ? ps : clone(DEFAULTS.presets)
     };
   }
@@ -718,6 +733,8 @@ details.panel[open]>summary::after{content:"–"}
     if(!force && panel.contains(document.activeElement)) return;
     $("tW").value = cfg.targetWater || "";
     $("tS").value = cfg.targetSalt || "";
+    $("bkInt").value = cfg.backupEveryDays;
+    renderBackupMeta();
     var box = $("presetRows");
     box.innerHTML = "";
     cfg.presets.forEach(function(p){
@@ -743,7 +760,7 @@ details.panel[open]>summary::after{content:"–"}
     renderBanner();
   }
 
-  function render(){ renderHeader(); renderGauges(); renderTiles(); renderTimeline(); renderWeek(); renderBanner(); }
+  function render(){ renderHeader(); renderGauges(); renderTiles(); renderTimeline(); renderWeek(); renderBanner(); renderBackupTip(); }
 
   /* ================= CSV ================= */
   function csvCell(v){
@@ -788,10 +805,73 @@ details.panel[open]>summary::after{content:"–"}
   }
 
   /* ---------- Sicherung & Übernahme ---------- */
-  function backupJson(){
-    saveFile("wasser-salz-sicherung-" + isoToday() + ".json",
-      JSON.stringify({app:"wasser-salz", version:1, exportedAt:new Date().toISOString(), cfg:cfg, days:dayCache}, null, 1),
-      "application/json");
+  /* Fingerabdruck des Datenbestands – erkennt, ob es seit der letzten Sicherung Neues gibt. */
+  function dataSignature(){
+    return Object.keys(dayCache).sort().map(function(d){
+      var x = dayCache[d];
+      return d + ":" + x.entries.length + ":" + (x.saltG == null ? "-" : x.saltG);
+    }).join("|");
+  }
+  function backupState(){ return lsGet("ws.lastBackup") || null; }
+  function markBackup(){
+    lsSet("ws.lastBackup", {at:new Date().toISOString(), sig:dataSignature()});
+    renderBackupTip(); renderSettings(true);
+  }
+  function daysSince(iso){
+    return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  }
+  function hasData(){ return Object.keys(dayCache).some(function(d){
+    return dayCache[d].entries.length || dayCache[d].saltG != null; }); }
+
+  function renderBackupMeta(){
+    var el = $("bkLast");
+    if(!el) return;
+    var st = backupState();
+    el.textContent = st
+      ? "Letzte Sicherung: " + new Date(st.at).toLocaleString("de-AT", {dateStyle:"medium", timeStyle:"short"})
+        + (st.sig === dataSignature() ? " · aktuell" : " · seither geändert")
+      : "Noch nie gesichert.";
+  }
+
+  function renderBackupTip(){
+    renderBackupMeta();
+    var tip = $("backupTip");
+    if(!tip) return;
+    var every = cfg.backupEveryDays;
+    if(!every || !hasData()){ tip.hidden = true; return; }
+    var st = backupState();
+    var txt = "";
+    if(!st){
+      var n = Object.keys(dayCache).filter(function(d){
+        return dayCache[d].entries.length || dayCache[d].saltG != null; }).length;
+      txt = "Noch nie gesichert · " + n + (n === 1 ? " Tag" : " Tage") + " nur auf diesem Gerät.";
+    } else if(st.sig !== dataSignature() && daysSince(st.at) >= every){
+      var d = daysSince(st.at);
+      txt = "Letzte Sicherung vor " + (d === 0 ? "heute" : d + (d === 1 ? " Tag" : " Tagen")) + " · seither Neues dazugekommen.";
+    }
+    if(txt){ $("backupTipText").textContent = txt; tip.hidden = false; }
+    else tip.hidden = true;
+  }
+
+  /* Sicherung: auf dem iPhone über das Teilen-Menü (dort "In Dateien sichern"),
+     sonst als normaler Download. */
+  async function backupJson(){
+    var name = "wasser-salz-sicherung-" + isoToday() + ".json";
+    var text = JSON.stringify({app:"wasser-salz", version:1,
+      exportedAt:new Date().toISOString(), cfg:cfg, days:dayCache}, null, 1);
+    try{
+      var file = new File([text], name, {type:"application/json"});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file], title:"Wasser & Salz – Sicherung"});
+        markBackup();
+        showToast("Sicherung abgelegt.");
+        return;
+      }
+    }catch(err){
+      if(err && (err.name === "AbortError" || err.name === "NotAllowedError")) return;
+    }
+    saveFile(name, text, "application/json");
+    markBackup();
   }
   function applyDays(incoming, quelle){
     var n = 0;
@@ -809,6 +889,7 @@ details.panel[open]>summary::after{content:"–"}
     if(!confirm("Sicherung einlesen? Tage mit gleichem Datum werden überschrieben.")) return;
     if(data.cfg){ cfg = normCfg(data.cfg); saveCfg(); }
     applyDays(data.days, "der Sicherung");
+    markBackup();
   }
   function readCsv(text){
     var lines = text.replace(/^\ufeff/, "").split(/\r?\n/).filter(function(l){ return l.trim(); });
@@ -927,6 +1008,13 @@ details.panel[open]>summary::after{content:"–"}
   $("csvEntries").addEventListener("click", safe(function(){ download("wasser-salz-eintraege.csv", csvEntries()); }));
   $("csvDays").addEventListener("click", safe(function(){ download("wasser-salz-tage.csv", csvDays()); }));
   $("backupSave").addEventListener("click", safe(backupJson));
+  $("backupNow").addEventListener("click", safe(backupJson));
+  $("bkInt").addEventListener("change", safe(function(e){
+    var v = Number(e.target.value);
+    cfg.backupEveryDays = (isFinite(v) && v >= 0) ? Math.min(99, Math.round(v)) : 3;
+    e.target.value = cfg.backupEveryDays;
+    saveCfg(); renderBackupTip();
+  }));
   $("backupLoad").addEventListener("click", safe(function(){ pickFile(safe(readJson)); }));
   $("csvLoad").addEventListener("click", safe(function(){ pickFile(safe(readCsv)); }));
 

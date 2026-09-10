@@ -48,6 +48,15 @@ Unter **Einstellungen › Sicherung**:
 | `Sicherung einlesen` | Backup zurückspielen, z. B. nach Gerätewechsel |
 | `Einträge-CSV einlesen` | Daten aus einer CSV übernehmen |
 
+Auf dem iPhone öffnet `Sicherung speichern` das Teilen-Menü — dort **In Dateien
+sichern** wählen und einen iCloud-Ordner nehmen, dann liegt das Backup in der
+iCloud. Beim zweiten Mal merkt sich iOS den Ordner.
+
+Die App erinnert von selbst, wenn seit der letzten Sicherung Änderungen
+dazugekommen sind und sie älter als *n* Tage ist (`Erinnerung alle … Tage`,
+Standard 3, `0` schaltet sie ab). Der Stand der letzten Sicherung steht in den
+Einstellungen.
+
 Und unter **Einstellungen › Export** zwei CSV-Dateien (semikolongetrennt, direkt
 in Google Sheets importierbar über *Datei › Importieren*):
 
