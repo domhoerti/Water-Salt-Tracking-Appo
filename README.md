@@ -66,6 +66,31 @@ in Google Sheets importierbar über *Datei › Importieren*):
 Werden in Safari die Website-Daten gelöscht, sind die Einträge weg — also ab und
 zu eine Sicherung speichern.
 
+## Synchronisierung (optional)
+
+Ohne Einrichtung läuft die App rein lokal. Mit einem Gratis-Projekt bei
+[Supabase](https://supabase.com) gleicht sie sich über alle Geräte ab und ist
+damit auch gesichert:
+
+1. Bei Supabase ein Projekt anlegen.
+2. `supabase/schema.sql` im **SQL Editor** einfügen und ausführen. Legt zwei
+   Tabellen an und schaltet Row Level Security ein.
+3. Unter *Authentication › URL Configuration* die **Site URL** auf
+   `https://domhoerti.github.io/Water-Salt-Tracking-Appo/` setzen.
+4. In `config.js` die **Project URL** und den **anon public** Schlüssel
+   eintragen.
+
+In der App dann unter *Einstellungen › Synchronisierung* die E-Mail eintragen,
+Link antippen, fertig. Kein Passwort.
+
+Beide Werte in `config.js` sind für den Browser gedacht und dürfen öffentlich
+stehen — die Daten schützt Row Level Security in der Datenbank, nicht die
+Geheimhaltung des Schlüssels. Der `service_role`-Schlüssel gehört **niemals**
+in dieses Repository: der umgeht RLS.
+
+Der Abgleich ist offline-first: gearbeitet wird immer lokal, bei Verbindung
+werden Tage in beide Richtungen abgeglichen, der jüngere Zeitstempel gewinnt.
+
 ## Dateien
 
 | Datei | Zweck |
@@ -74,6 +99,8 @@ zu eine Sicherung speichern.
 | `manifest.webmanifest` | Name, Icon, Vollbildmodus |
 | `sw.js` | Service Worker, macht die App offlinefähig |
 | `icons/` | App-Icons (inkl. Quell-SVG) |
+| `config.js` | Zugangsdaten für die Synchronisierung (leer = rein lokal) |
+| `supabase/schema.sql` | Tabellen und Sicherheitsregeln für Supabase |
 
 Keine Abhängigkeiten, kein Build-Schritt. Einzige externe Ressource sind die
 Schriften (IBM Plex) von Google Fonts; die legt der Service Worker beim ersten

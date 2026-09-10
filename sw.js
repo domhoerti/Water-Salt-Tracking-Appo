@@ -1,5 +1,5 @@
 /* Wasser & Salz – Offline-Cache */
-const VERSION = "wasser-salz-v3";
+const VERSION = "wasser-salz-v4";
 const SHELL = [
   "./",
   "./index.html",
@@ -7,7 +7,8 @@ const SHELL = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-maskable-512.png",
-  "./icons/apple-touch-icon-180.png"
+  "./icons/apple-touch-icon-180.png",
+  "./config.js"
 ];
 
 self.addEventListener("install", (e) => {
@@ -31,8 +32,9 @@ self.addEventListener("fetch", (e) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
 
-  // Schriften von Google: erst Cache, sonst Netz und dann ablegen.
-  if (url.hostname.endsWith("googleapis.com") || url.hostname.endsWith("gstatic.com")) {
+  // Schriften und die Sync-Bibliothek: erst Cache, sonst Netz und dann ablegen.
+  if (url.hostname.endsWith("googleapis.com") || url.hostname.endsWith("gstatic.com")
+      || url.hostname.endsWith("jsdelivr.net")) {
     e.respondWith(
       caches.match(req).then((hit) => hit || fetch(req).then((res) => {
         const copy = res.clone();

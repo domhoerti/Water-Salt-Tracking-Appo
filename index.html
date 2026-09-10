@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Tages-Tracker für Trinkmenge und Salz">
 <link rel="manifest" href="manifest.webmanifest">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Wasser & Salz">
@@ -317,6 +319,24 @@ details.panel[open]>summary::after{content:"–"}
         </div>
         <p class="hint" style="margin:8px 0 0">Semikolon-getrennt, direkt in Google Sheets importierbar (Datei › Importieren).</p>
       </div>
+      <div id="syncBox" hidden>
+        <div class="subhead" style="margin-bottom:8px">Synchronisierung</div>
+        <div id="syncOut">
+          <p class="hint" style="margin:0 0 8px">Anmelden, damit deine Daten gesichert sind und auf allen Geräten gleich stehen. Du bekommst einen Link per E-Mail, kein Passwort nötig.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input id="syncMail" type="email" inputmode="email" autocomplete="email" placeholder="deine@mail.at"
+                   style="flex:1;min-width:160px;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:8px 9px">
+            <button class="btn" id="syncLogin">Link schicken</button>
+          </div>
+        </div>
+        <div id="syncIn" hidden>
+          <p class="hint" style="margin:0 0 8px">Angemeldet als <b id="syncWho"></b><br><span id="syncWhen"></span></p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn--ghost" id="syncNow">Jetzt abgleichen</button>
+            <button class="btn btn--ghost" id="syncOff">Abmelden</button>
+          </div>
+        </div>
+      </div>
       <div>
         <div class="subhead" style="margin-bottom:8px">Sicherung</div>
         <p class="hint" style="margin:0 0 8px">Deine Daten liegen nur auf diesem Gerät. Sichere sie ab und zu – dann geht nichts verloren, wenn das iPhone mal neu aufgesetzt wird.</p>
@@ -401,6 +421,7 @@ details.panel[open]>summary::after{content:"–"}
     var list = Array.isArray(d.entries) ? d.entries : [];
     return {
       date: date,
+      updatedAt: typeof d.updatedAt === "string" ? d.updatedAt : "1970-01-01T00:00:00.000Z",
       saltG: (typeof d.saltG === "number" && isFinite(d.saltG)) ? d.saltG : null,
       entries: list.filter(function(e){ return e && e.ts; }).map(function(e){
         return {
@@ -428,6 +449,7 @@ details.panel[open]>summary::after{content:"–"}
       targetWater: Math.max(0, Math.round(Number(c.targetWater)||0)),
       targetSalt: Math.max(0, Math.round((Number(c.targetSalt)||0)*10)/10),
       targetsSet: !!c.targetsSet,
+      updatedAt: typeof c.updatedAt === "string" ? c.updatedAt : "1970-01-01T00:00:00.000Z",
       backupEveryDays: (isFinite(be) && be >= 0) ? Math.min(99, Math.round(be)) : 3,
       presets: ps.length ? ps : clone(DEFAULTS.presets)
     };
@@ -465,13 +487,17 @@ details.panel[open]>summary::after{content:"–"}
   function noteErr(e){ setSync(e && e.code === "quota_exceeded" ? "Speicher voll" : "nur lokal"); }
 
   function saveCfg(){
+    cfg.updatedAt = new Date().toISOString();
     lsSet(LS_CFG, cfg);
     if(db) db.doc("settings/config").set(clone(cfg)).catch(noteErr);
+    Sync.queueCfg();
   }
   function saveDay(date){
     var d = day(date);
+    d.updatedAt = new Date().toISOString();
     lsSet(LS_DAY+date, d); lsTouch(date);
     if(db) db.doc("days/"+date).set(clone(d)).catch(noteErr);
+    Sync.queueDay(date);
   }
 
   function loadLocal(){
@@ -483,7 +509,7 @@ details.panel[open]>summary::after{content:"–"}
   }
 
   /* Eigenständige App: alles bleibt auf diesem Gerät. */
-  function connect(){ setSync("auf diesem Gerät"); }
+  function connect(){ Sync.init(); }
   function watchDay(){}
 
   /* ================= Aktionen ================= */
@@ -762,6 +788,173 @@ details.panel[open]>summary::after{content:"–"}
 
   function render(){ renderHeader(); renderGauges(); renderTiles(); renderTimeline(); renderWeek(); renderBanner(); renderBackupTip(); }
 
+  /* ================= Synchronisierung (Supabase) =================
+     Offline-first: localStorage bleibt der Arbeitsspeicher. Der Abgleich
+     schiebt Tage in beide Richtungen, jüngerer Zeitstempel gewinnt. */
+  var Sync = (function(){
+    var sb = null, session = null, dirtyDays = {}, dirtyCfg = false, timer = null, busy = false;
+
+    function cfgOk(){
+      var c = window.WS_CONFIG || {};
+      return !!(c.supabaseUrl && c.supabaseAnonKey);
+    }
+    function online(){ return navigator.onLine !== false; }
+    function active(){ return !!(sb && session); }
+
+    function status(){
+      if(!cfgOk()){ setSync("auf diesem Gerät"); return; }
+      if(!session){ setSync("nicht angemeldet"); return; }
+      setSync(online() ? (busy ? "gleicht ab …" : "synchronisiert") : "offline");
+      renderSyncUi();
+    }
+
+    async function init(){
+      if(!cfgOk()){ status(); return; }
+      // supabase.js kommt per defer – kurz darauf warten.
+      for(var i = 0; i < 40 && !window.supabase; i++) await new Promise(function(r){ setTimeout(r, 100); });
+      if(!window.supabase){ setSync(online() ? "Sync nicht ladbar" : "offline"); return; }
+      sb = window.supabase.createClient(window.WS_CONFIG.supabaseUrl, window.WS_CONFIG.supabaseAnonKey, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+      });
+      var got = await sb.auth.getSession();
+      session = got.data ? got.data.session : null;
+      sb.auth.onAuthStateChange(function(_e, s){
+        session = s;
+        status(); renderSyncUi();
+        if(s) full();
+      });
+      status(); renderSyncUi();
+      if(session) full();
+      window.addEventListener("online", function(){ status(); if(active()) full(); });
+      window.addEventListener("offline", status);
+    }
+
+    async function sendLink(email){
+      if(!sb) return showToast("Sync ist nicht eingerichtet.");
+      var res = await sb.auth.signInWithOtp({
+        email: email,
+        options: { emailRedirectTo: location.origin + location.pathname }
+      });
+      if(res.error) showToast("Ging nicht: " + res.error.message);
+      else showToast("Link ist unterwegs an " + email + ".");
+    }
+    async function signOut(){
+      if(!sb) return;
+      await sb.auth.signOut();
+      session = null; status(); renderSyncUi();
+      showToast("Abgemeldet. Die Daten bleiben auf diesem Gerät.");
+    }
+
+    function rowToDay(r){
+      return normDay(r.date, {
+        date: r.date,
+        saltG: r.salt_g == null ? null : Number(r.salt_g),
+        entries: r.entries || [],
+        updatedAt: r.updated_at
+      });
+    }
+    function dayToRow(d){
+      return { user_id: session.user.id, date: d.date, salt_g: d.saltG,
+               entries: d.entries, updated_at: d.updatedAt };
+    }
+
+    async function full(){
+      if(!active() || !online() || busy) return;
+      busy = true; status();
+      try{
+        var res = await sb.from("tracker_days").select("date,salt_g,entries,updated_at");
+        if(res.error) throw res.error;
+        var remote = {}, changed = false;
+        (res.data || []).forEach(function(r){ remote[r.date] = r; });
+
+        // Fernstand übernehmen, wo er jünger ist
+        Object.keys(remote).forEach(function(date){
+          var inc = rowToDay(remote[date]);
+          var loc = dayCache[date];
+          if(!loc || inc.updatedAt > loc.updatedAt){
+            dayCache[date] = inc; lsSet(LS_DAY+date, inc); lsTouch(date); changed = true;
+          }
+        });
+        // eigenen Stand hochschieben, wo er jünger ist
+        var push = Object.keys(dayCache).filter(function(date){
+          var r = remote[date];
+          return !r || dayCache[date].updatedAt > r.updated_at;
+        }).map(function(date){ return dayToRow(dayCache[date]); });
+        if(push.length){
+          var up = await sb.from("tracker_days").upsert(push, { onConflict: "user_id,date" });
+          if(up.error) throw up.error;
+        }
+
+        // Einstellungen
+        var cs = await sb.from("tracker_settings").select("config,updated_at").maybeSingle();
+        if(cs.error) throw cs.error;
+        if(cs.data && cs.data.updated_at > cfg.updatedAt){
+          cfg = normCfg(cs.data.config); lsSet(LS_CFG, cfg); changed = true;
+        } else if(!cs.data || cfg.updatedAt > cs.data.updated_at){
+          var cu = await sb.from("tracker_settings").upsert(
+            { user_id: session.user.id, config: cfg, updated_at: cfg.updatedAt },
+            { onConflict: "user_id" });
+          if(cu.error) throw cu.error;
+        }
+
+        dirtyDays = {}; dirtyCfg = false;
+        lsSet("ws.lastSync", new Date().toISOString());
+        if(changed){ render(); renderSettings(true); }
+      }catch(e){
+        showToast("Abgleich fehlgeschlagen: " + (e.message || e.code || "unbekannt"));
+      }finally{ busy = false; status(); renderSyncUi(); }
+    }
+
+    async function flush(){
+      if(!active() || !online()) return;
+      var dates = Object.keys(dirtyDays);
+      if(!dates.length && !dirtyCfg) return;
+      try{
+        if(dates.length){
+          var rows = dates.filter(function(d){ return dayCache[d]; }).map(function(d){ return dayToRow(dayCache[d]); });
+          var up = await sb.from("tracker_days").upsert(rows, { onConflict: "user_id,date" });
+          if(up.error) throw up.error;
+          dirtyDays = {};
+        }
+        if(dirtyCfg){
+          var cu = await sb.from("tracker_settings").upsert(
+            { user_id: session.user.id, config: cfg, updated_at: cfg.updatedAt }, { onConflict: "user_id" });
+          if(cu.error) throw cu.error;
+          dirtyCfg = false;
+        }
+        lsSet("ws.lastSync", new Date().toISOString());
+        renderSyncUi();
+      }catch(e){ setSync("Abgleich offen"); }
+    }
+    function schedule(){
+      clearTimeout(timer);
+      timer = setTimeout(function(){ flush(); }, 1200);
+    }
+
+    function renderSyncUi(){
+      var box = $("syncBox");
+      if(!box) return;
+      box.hidden = !cfgOk();
+      if(!cfgOk()) return;
+      $("syncOut").hidden = !!session;
+      $("syncIn").hidden = !session;
+      if(session){
+        $("syncWho").textContent = session.user.email || "angemeldet";
+        var last = lsGet("ws.lastSync");
+        $("syncWhen").textContent = last
+          ? "Zuletzt abgeglichen: " + new Date(last).toLocaleString("de-AT", {dateStyle:"medium", timeStyle:"short"})
+          : "Noch nicht abgeglichen.";
+      }
+    }
+
+    return {
+      init: init, full: full, sendLink: sendLink, signOut: signOut,
+      renderUi: renderSyncUi, configured: cfgOk,
+      queueDay: function(date){ if(active()){ dirtyDays[date] = true; schedule(); } },
+      queueCfg: function(){ if(active()){ dirtyCfg = true; schedule(); } }
+    };
+  })();
+
   /* ================= CSV ================= */
   function csvCell(v){
     var s = String(v == null ? "" : v);
@@ -935,6 +1128,7 @@ details.panel[open]>summary::after{content:"–"}
   loadLocal();
   render();
   renderSettings(true);
+  Sync.renderUi();
 
   $("prevDay").addEventListener("click", safe(function(){
     cur = shiftIso(cur,-1); editingId = null; lastUndo = null; render(); watchDay();
@@ -1007,6 +1201,15 @@ details.panel[open]>summary::after{content:"–"}
   }));
   $("csvEntries").addEventListener("click", safe(function(){ download("wasser-salz-eintraege.csv", csvEntries()); }));
   $("csvDays").addEventListener("click", safe(function(){ download("wasser-salz-tage.csv", csvDays()); }));
+  $("syncLogin").addEventListener("click", safe(function(){
+    var mail = $("syncMail").value.trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)){ showToast("Bitte eine gültige E-Mail-Adresse."); return; }
+    Sync.sendLink(mail);
+  }));
+  $("syncMail").addEventListener("keydown", safe(function(e){ if(e.key === "Enter"){ e.preventDefault(); $("syncLogin").click(); } }));
+  $("syncNow").addEventListener("click", safe(function(){ Sync.full(); }));
+  $("syncOff").addEventListener("click", safe(function(){ Sync.signOut(); }));
+
   $("backupSave").addEventListener("click", safe(backupJson));
   $("backupNow").addEventListener("click", safe(backupJson));
   $("bkInt").addEventListener("change", safe(function(e){
