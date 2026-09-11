@@ -1,4 +1,4 @@
-# Water-Salt-Tracking-Appo
+# Water-Salt-Tracking-App
 
 Tages-Tracker für Trinkmenge und Salz — ideal for tracking salt & water in peak weeks.
 
