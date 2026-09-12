@@ -67,7 +67,7 @@ body{
   font:400 15px/1.5 "IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
   -webkit-text-size-adjust:100%;
 }
-.wrap{max-width:620px;margin:0 auto;padding:18px 16px calc(96px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:18px}
+.wrap{max-width:620px;margin:0 auto;padding:14px 16px calc(96px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
 h1,h2,h3{margin:0;font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-weight:600;text-wrap:balance}
 .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
 .eyebrow{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--faint);font-weight:600}
@@ -78,7 +78,7 @@ input[type=number]{-moz-appearance:textfield}
 input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
 /* ---------- header ---------- */
-header{display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-direction:column;gap:9px}
 .masthead{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
 .masthead h1{font-size:20px;letter-spacing:-.01em}
 .datenav{display:flex;align-items:center;gap:8px}
@@ -99,9 +99,9 @@ header{display:flex;flex-direction:column;gap:12px}
 .datenav .day small{display:block;font-family:"IBM Plex Mono",monospace;font-weight:400;font-size:11px;color:var(--faint);letter-spacing:.04em}
 
 /* ---------- gauges ---------- */
-.gauge{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.gauge{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px 10px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
 .gauge__top{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
-.gauge__fig{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;font-size:34px;line-height:.95;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.gauge__fig{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;font-size:31px;line-height:.95;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .gauge--water .gauge__fig{color:var(--water)}
 .gauge--salt .gauge__fig{color:var(--salt)}
 .gauge__of{font-size:13px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
@@ -109,7 +109,7 @@ header{display:flex;flex-direction:column;gap:12px}
 .gauge__note b{font-weight:500;color:var(--ink)}
 
 /* Messzylinder-Skala */
-.meter{position:relative;height:34px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface-2);overflow:hidden}
+.meter{position:relative;height:22px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface-2);overflow:hidden}
 .meter__fill{position:absolute;inset:0 auto 0 0;width:0;transition:width .28s ease}
 .gauge--water .meter__fill{background:var(--water-soft)}
 .gauge--salt .meter__fill{background:var(--salt-soft)}
@@ -232,6 +232,7 @@ details.panel[open]>summary::after{content:"–"}
 </head>
 <body>
 <div class="wrap">
+
   <header>
     <div class="masthead">
       <h1>Wasser &amp; Salz</h1>
@@ -251,11 +252,6 @@ details.panel[open]>summary::after{content:"–"}
     <button id="bannerGo">Ziele setzen</button>
   </div>
 
-  <div id="backupTip" hidden class="banner banner--backup">
-    <span id="backupTipText"></span>
-    <button id="backupNow">Jetzt sichern</button>
-  </div>
-
   <section class="gauge gauge--water">
     <div class="gauge__top">
       <div><span class="eyebrow">Wasser gesamt</span>
@@ -267,8 +263,18 @@ details.panel[open]>summary::after{content:"–"}
       <div class="meter__edge" id="wEdge" style="left:0"></div>
       <div class="meter__ticks" id="wTicks"></div>
     </div>
-    <div class="meter__scale"><span>0</span><span id="wHalf">–</span><span id="wMax">–</span></div>
     <div class="gauge__note"><span id="wRest">–</span><span id="wLast"></span></div>
+  </section>
+
+  <section class="sect">
+    <div class="secthead"><h2 style="font-size:15px">Schnell loggen</h2><span class="hint">Tippen = mit Uhrzeit eintragen</span></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="freeform">
+      <input id="ffMl" type="number" inputmode="numeric" min="1" placeholder="ml">
+      <input id="ffLabel" type="text" placeholder="Bezeichnung" list="ffList">
+      <datalist id="ffList"></datalist>
+      <button class="btn" id="ffAdd">Eintragen</button>
+    </div>
   </section>
 
   <section class="gauge gauge--salt">
@@ -302,16 +308,10 @@ details.panel[open]>summary::after{content:"–"}
     <div class="gauge__note"><span id="sRest">–</span><span id="sNa" class="mono"></span></div>
   </section>
 
-  <section class="sect">
-    <div class="secthead"><h2 style="font-size:15px">Schnell loggen</h2><span class="hint">Tippen = mit Uhrzeit eintragen</span></div>
-    <div class="tiles" id="tiles"></div>
-    <div class="freeform">
-      <input id="ffMl" type="number" inputmode="numeric" min="1" placeholder="ml">
-      <input id="ffLabel" type="text" placeholder="Bezeichnung (z. B. Glas Wasser)" list="ffList">
-      <datalist id="ffList"></datalist>
-      <button class="btn" id="ffAdd">Eintragen</button>
-    </div>
-  </section>
+  <div id="backupTip" hidden class="banner banner--backup">
+    <span id="backupTipText"></span>
+    <button id="backupNow">Jetzt sichern</button>
+  </div>
 
   <section class="sect">
     <div class="secthead"><h2 style="font-size:15px">Zeitleiste</h2><span class="hint">Eintrag antippen zum Korrigieren</span></div>
@@ -395,7 +395,7 @@ details.panel[open]>summary::after{content:"–"}
 (function(){
   "use strict";
 
-  var APP_VERSION = "1.2";
+  var APP_VERSION = "1.3";
   var TAGE_VORAUS = 31;          // so weit lässt sich vorausplanen
 
   /* ================= Modell ================= */
@@ -635,8 +635,6 @@ details.panel[open]>summary::after{content:"–"}
     $("wFill").style.width = pct+"%";
     $("wEdge").style.left = "calc("+pct+"% - 1px)";
     drawTicks($("wTicks"), tw, 500);
-    $("wHalf").textContent = tw ? nf(tw/2) : "";
-    $("wMax").textContent  = tw ? nf(tw)+" ml" : "";
     var rest = tw - total;
     var wr = $("wRest");
     wr.className = rest < 0 ? "over" : "";
