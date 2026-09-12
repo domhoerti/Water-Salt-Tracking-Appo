@@ -139,6 +139,9 @@ header{display:flex;flex-direction:column;gap:9px}
 .syncform{display:flex;flex-direction:column;gap:7px}
 .syncform input{background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:9px 10px;width:100%}
 .syncform .btn{align-self:flex-start}
+#ghMsg{margin:9px 0 0;font-size:12.5px;line-height:1.5;border-radius:8px;padding:9px 10px}
+#ghMsg.fehler{background:var(--salt-soft);color:var(--salt-ink)}
+#ghMsg.ok{background:var(--water-soft);color:var(--water-ink)}
 code{font-family:"IBM Plex Mono",monospace;font-size:.92em;background:var(--surface-2);padding:1px 4px;border-radius:4px}
 
 /* ---------- Kacheln ---------- */
@@ -357,6 +360,7 @@ details.panel[open]>summary::after{content:"–"}
             <input id="ghToken" type="password" autocomplete="off" placeholder="github_pat_…" aria-label="Zugriffsschlüssel">
             <button class="btn" id="ghConnect">Verbinden</button>
           </div>
+          <p id="ghMsg" hidden></p>
           <p class="hint" style="margin:9px 0 0">Schlüssel erzeugen: GitHub → <i>Settings</i> → <i>Developer settings</i> → <i>Personal access tokens</i> → <b>Fine-grained tokens</b>. Nur dieses eine Repo auswählen, Berechtigung <b>Contents: Read and write</b>, sonst nichts.</p>
         </div>
         <div id="syncIn" hidden>
@@ -399,7 +403,7 @@ details.panel[open]>summary::after{content:"–"}
 (function(){
   "use strict";
 
-  var APP_VERSION = "2.0";
+  var APP_VERSION = "2.1";
   var TAGE_VORAUS = 31;          // so weit lässt sich vorausplanen
 
   /* ================= Modell ================= */
@@ -870,11 +874,16 @@ details.panel[open]>summary::after{content:"–"}
       });
     }
     function err(r){
-      if(r.status === 401) return {msg:"Schlüssel ungültig oder abgelaufen"};
-      if(r.status === 403) return {msg:"Zugriff verweigert – Rechte des Schlüssels prüfen"};
-      if(r.status === 404) return {msg:"Repo nicht gefunden oder Schlüssel ohne Zugriff"};
-      if(r.status === 429) return {msg:"Zu viele Anfragen – später nochmal"};
-      return {msg:"GitHub meldet Fehler " + r.status};
+      if(r.status === 401) return {kurz:"Schlüssel abgelehnt", code:401,
+        msg:"GitHub hat den Schlüssel abgelehnt (401). Er ist abgelaufen, widerrufen oder beim Kopieren unvollständig geblieben. Erzeug einen neuen und füg ihn komplett ein – er beginnt mit github_pat_ und ist sehr lang."};
+      if(r.status === 403) return {kurz:"Zugriff verweigert", code:403,
+        msg:"Zugriff verweigert (403). Dem Schlüssel fehlt die Berechtigung. Auf GitHub beim Token unter Repository permissions die Zeile Contents auf Read and write stellen."};
+      if(r.status === 404) return {kurz:"Nicht gefunden", code:404,
+        msg:"Repo nicht gefunden (404). Zwei häufige Ursachen: der Repo-Name stimmt nicht genau (Groß- und Kleinschreibung zählt), oder der Schlüssel wurde nicht für dieses Repo freigegeben – beim Token unter Repository access muss Only select repositories stehen und genau dieses Repo ausgewählt sein."};
+      if(r.status === 429) return {kurz:"Zu viele Anfragen", code:429,
+        msg:"GitHub bremst gerade (429). Warte eine Minute und probier es nochmal."};
+      return {kurz:"Fehler " + r.status, code:r.status,
+        msg:"GitHub meldet Fehler " + r.status + ". Probier es später nochmal."};
     }
 
     /* Base64 über TextEncoder, sonst zerbrechen Umlaute in den Bezeichnungen. */
@@ -980,22 +989,42 @@ details.panel[open]>summary::after{content:"–"}
       conf = {owner:owner, repo:repo, token:token, branch:"main", path:"daten.json"};
       busy = true; lastErr = null; status();
       try{
-        var r = await api("/repos/" + owner + "/" + repo);
+        var r;
+        try{ r = await api("/repos/" + owner + "/" + repo); }
+        catch(netz){
+          throw {kurz:"Keine Verbindung",
+                 msg:"GitHub ist nicht erreichbar. Bist du online? Im Flugmodus oder ohne Empfang kann die App sich nicht verbinden."};
+        }
         if(!r.ok) throw err(r);
         var info = await r.json();
         conf.branch = info.default_branch || "main";
-        if(info.permissions && info.permissions.push === false) throw {msg:"Schlüssel darf nicht schreiben"};
+        if(info.permissions && info.permissions.push === false){
+          throw {kurz:"Kein Schreibrecht",
+                 msg:"Der Schlüssel darf dieses Repo nur lesen. Auf GitHub beim Token unter Repository permissions die Zeile Contents auf Read and write stellen (nicht nur Read)."};
+        }
         lsSet(LS_CONF, conf);
         busy = false;
-        if(!info.private) showToast("Achtung: Dieses Repo ist öffentlich – deine Daten wären für jeden lesbar.");
         await full(true);
+        if(lastErr) throw {kurz:"Schreiben fehlgeschlagen", msg:lastErr};
+        ghMsg(info.private
+          ? "Verbunden mit " + owner + "/" + repo + ". Deine Daten werden ab jetzt automatisch gesichert."
+          : "Verbunden – ACHTUNG: " + owner + "/" + repo + " ist ÖFFENTLICH. Stell es auf privat, sonst kann jeder deine Daten lesen.", !info.private);
         return true;
       }catch(e){
         conf = null; busy = false;
-        lastErr = (e && e.msg) || "Verbindung fehlgeschlagen";
-        status(); renderUi(); showToast(lastErr);
+        lastErr = (e && e.kurz) || "Verbindung fehlgeschlagen";
+        status(); renderUi();
+        ghMsg((e && e.msg) || "Verbindung fehlgeschlagen.", true);
         return false;
       }
+    }
+
+    function ghMsg(text, fehler){
+      var el = $("ghMsg");
+      if(!el) return;
+      el.textContent = text;
+      el.className = fehler ? "fehler" : "ok";
+      el.hidden = false;
     }
 
     function disconnect(){
@@ -1307,14 +1336,36 @@ details.panel[open]>summary::after{content:"–"}
   }));
   $("csvEntries").addEventListener("click", safe(function(){ download("wasser-salz-eintraege.csv", csvEntries()); }));
   $("csvDays").addEventListener("click", safe(function(){ download("wasser-salz-tage.csv", csvDays()); }));
+  function ghMsgOut(text){
+    var el = $("ghMsg");
+    if(el){ el.textContent = text; el.className = "fehler"; el.hidden = false; }
+  }
   $("ghConnect").addEventListener("click", safe(function(){
-    var owner = $("ghOwner").value.trim().replace(/^@/, "");
-    var repo  = $("ghRepo").value.trim().replace(/\.git$/, "");
-    var token = $("ghToken").value.trim();
-    if(repo.indexOf("/") > -1){ var pp = repo.split("/"); owner = pp[0]; repo = pp[1]; }
-    if(!owner || !repo || !token){ showToast("Benutzername, Repo und Schlüssel ausfüllen."); return; }
+    var owner = $("ghOwner").value.trim().replace(/^@/, "").replace(/\/+$/, "");
+    var repo  = $("ghRepo").value.trim();
+    var token = $("ghToken").value.replace(/\s+/g, "");
+
+    /* Erlaubt: "name", "owner/name" und eine ganze GitHub-Adresse. */
+    repo = repo.replace(/^https?:\/\/(www\.)?github\.com\//i, "")
+               .replace(/\.git$/i, "").replace(/^\/+|\/+$/g, "");
+    if(repo.indexOf("/") > -1){
+      var pp = repo.split("/").filter(Boolean);
+      if(pp.length >= 2){ owner = pp[0]; repo = pp[1]; } else { repo = pp[0] || ""; }
+    }
+    owner = owner.replace(/^https?:\/\/(www\.)?github\.com\//i, "").split("/")[0];
+
+    if(!owner || !repo || !token){
+      ghMsgOut("Bitte alle drei Felder ausfüllen: Benutzername, Repo-Name und Schlüssel.");
+      return;
+    }
+    if(token.indexOf("github_pat_") !== 0 && token.indexOf("ghp_") !== 0){
+      ghMsgOut("Das sieht nicht nach einem GitHub-Schlüssel aus – er beginnt mit github_pat_ und ist rund 90 Zeichen lang.");
+      return;
+    }
+    ghMsgOut("Verbinde mit " + owner + "/" + repo + " …");
+    $("ghMsg").className = "";
     Sync.connectRepo(owner, repo, token).then(function(ok){
-      if(ok){ $("ghToken").value = ""; showToast("Verbunden und abgeglichen."); }
+      if(ok){ $("ghToken").value = ""; $("ghOwner").value = owner; $("ghRepo").value = repo; }
     });
   }));
   $("ghToken").addEventListener("keydown", safe(function(e){ if(e.key === "Enter"){ e.preventDefault(); $("ghConnect").click(); } }));
