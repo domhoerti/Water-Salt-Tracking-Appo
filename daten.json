@@ -1,17 +1,17 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-12T18:33:31.368Z",
+ "savedAt": "2026-09-12T18:36:41.404Z",
  "cfg": {
-  "targetWater": 4000,
-  "targetSalt": 10,
-  "targetsSet": false,
-  "updatedAt": "1970-01-01T00:00:00.000Z",
+  "targetWater": 6500,
+  "targetSalt": 9,
+  "targetsSet": true,
+  "updatedAt": "2026-09-12T18:34:46.913Z",
   "backupEveryDays": 3,
   "presets": [
    {
     "id": "shake",
-    "label": "Shake",
+    "label": "Shaker",
     "ml": 700,
     "perDay": 0
    },
@@ -50,14 +50,370 @@
     "label": "Reis",
     "ml": 150,
     "perDay": 1
+   },
+   {
+    "id": "mtv5tmu9rl95u",
+    "label": "Intra",
+    "ml": 700,
+    "perDay": 0
    }
   ]
  },
  "days": {
   "2026-09-12": {
    "date": "2026-09-12",
-   "updatedAt": "1970-01-01T00:00:00.000Z",
-   "saltG": null,
+   "updatedAt": "2026-09-12T17:38:00.065Z",
+   "saltG": 8.8,
+   "entries": [
+    {
+     "id": "mtxx1tt1k9cv6",
+     "label": "Doppio",
+     "ml": 80,
+     "ts": "2026-09-12T04:59:54.277Z",
+     "preset": "doppio"
+    },
+    {
+     "id": "mtxx1zve07jqs",
+     "label": "Reis",
+     "ml": 150,
+     "ts": "2026-09-12T05:00:02.138Z",
+     "preset": "rice"
+    },
+    {
+     "id": "mtxx20e93yz9v",
+     "label": "Porridge",
+     "ml": 250,
+     "ts": "2026-09-12T05:00:02.817Z",
+     "preset": "porridge"
+    },
+    {
+     "id": "mtxx20oa1zj2w",
+     "label": "Porridge",
+     "ml": 250,
+     "ts": "2026-09-12T05:00:03.178Z",
+     "preset": "porridge"
+    },
+    {
+     "id": "mtxx2jwo2hpac",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-12T05:00:28.104Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtxxt9688qflz",
+     "label": "Espresso",
+     "ml": 30,
+     "ts": "2026-09-12T05:21:13.904Z",
+     "preset": "espresso"
+    },
+    {
+     "id": "mty4ld02eew7i",
+     "label": "Doppio",
+     "ml": 80,
+     "ts": "2026-09-12T08:31:02.930Z",
+     "preset": "doppio"
+    },
+    {
+     "id": "mty8cyfhux76d",
+     "label": "gröbi",
+     "ml": 500,
+     "ts": "2026-09-12T10:16:29.260Z",
+     "preset": null
+    },
+    {
+     "id": "mty9ehsjwdvk6",
+     "label": "Monster / Cola Zero",
+     "ml": 500,
+     "ts": "2026-09-12T10:45:40.627Z",
+     "preset": "drink"
+    },
+    {
+     "id": "mty9r9vegl2er",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-12T10:55:36.890Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtycpxdvn70we",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-12T12:18:32.899Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtydmhqes0wqv",
+     "label": "Doppio",
+     "ml": 80,
+     "ts": "2026-09-12T12:43:52.262Z",
+     "preset": "doppio"
+    },
+    {
+     "id": "mtyellvu1kky2",
+     "label": "Monster / Cola Zero",
+     "ml": 500,
+     "ts": "2026-09-12T13:11:10.602Z",
+     "preset": "drink"
+    },
+    {
+     "id": "mtyhr8vih4ezy",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-12T14:39:32.526Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtyjgflcp8fez",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-12T15:27:07.248Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtyo4qv5wb2oq",
+     "label": "Wasser",
+     "ml": 345,
+     "ts": "2026-09-12T17:38:00.065Z",
+     "preset": null
+    }
+   ]
+  },
+  "2026-09-10": {
+   "date": "2026-09-10",
+   "updatedAt": "2026-09-10T18:55:09.063Z",
+   "saltG": 8.8,
+   "entries": [
+    {
+     "id": "mtv5ug39tgikg",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-10T06:42:00.000Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtv5u8yz5ckta",
+     "label": "Doppio",
+     "ml": 80,
+     "ts": "2026-09-10T06:42:38.699Z",
+     "preset": "doppio"
+    },
+    {
+     "id": "mtv5u9vl03yzu",
+     "label": "Espresso",
+     "ml": 30,
+     "ts": "2026-09-10T06:42:39.873Z",
+     "preset": "espresso"
+    },
+    {
+     "id": "mtv5uc9rtzh78",
+     "label": "Reis",
+     "ml": 150,
+     "ts": "2026-09-10T06:42:42.975Z",
+     "preset": "rice"
+    },
+    {
+     "id": "mtv5ucwe2nb2j",
+     "label": "Porridge",
+     "ml": 250,
+     "ts": "2026-09-10T06:42:43.790Z",
+     "preset": "porridge"
+    },
+    {
+     "id": "mtv5uda9pjo02",
+     "label": "Porridge",
+     "ml": 250,
+     "ts": "2026-09-10T06:42:44.289Z",
+     "preset": "porridge"
+    },
+    {
+     "id": "mtv5uhj8y7q8o",
+     "label": "Intra",
+     "ml": 700,
+     "ts": "2026-09-10T06:42:49.796Z",
+     "preset": "mtv5tmu9rl95u"
+    },
+    {
+     "id": "mtv5uiathzho4",
+     "label": "Monster / Cola Zero",
+     "ml": 500,
+     "ts": "2026-09-10T06:42:50.789Z",
+     "preset": "drink"
+    },
+    {
+     "id": "mtvbp6fzldkkn",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-10T09:26:39.839Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtve7n2xks5bl",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-10T10:37:00.441Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtvgvh3k6giqj",
+     "label": "Doppio",
+     "ml": 80,
+     "ts": "2026-09-10T11:51:31.664Z",
+     "preset": "doppio"
+    },
+    {
+     "id": "mtvheasbxen6i",
+     "label": "wasser zum kaffee",
+     "ml": 100,
+     "ts": "2026-09-10T12:06:09.947Z",
+     "preset": null
+    },
+    {
+     "id": "mtvlp2oyrsefp",
+     "label": "Monster / Cola Zero",
+     "ml": 500,
+     "ts": "2026-09-10T14:06:31.138Z",
+     "preset": "drink"
+    },
+    {
+     "id": "mtvn0inl2c7w1",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-10T14:43:24.657Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtvs0nxyqz7p3",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-10T17:03:29.590Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtvw09afyias9",
+     "label": "Glas Wasser",
+     "ml": 300,
+     "ts": "2026-09-10T18:55:09.063Z",
+     "preset": null
+    }
+   ]
+  },
+  "2026-09-11": {
+   "date": "2026-09-11",
+   "updatedAt": "2026-09-11T20:03:32.364Z",
+   "saltG": 8.8,
+   "entries": [
+    {
+     "id": "mtwi7y1c7yvd5",
+     "label": "Reis",
+     "ml": 150,
+     "ts": "2026-09-11T05:16:59.280Z",
+     "preset": "rice"
+    },
+    {
+     "id": "mtwi7yqcv2nkd",
+     "label": "Porridge",
+     "ml": 250,
+     "ts": "2026-09-11T05:17:00.180Z",
+     "preset": "porridge"
+    },
+    {
+     "id": "mtwi7ywo9t66f",
+     "label": "Porridge",
+     "ml": 250,
+     "ts": "2026-09-11T05:17:00.408Z",
+     "preset": "porridge"
+    },
+    {
+     "id": "mtwi80sjfny91",
+     "label": "Doppio",
+     "ml": 80,
+     "ts": "2026-09-11T05:17:02.851Z",
+     "preset": "doppio"
+    },
+    {
+     "id": "mtwj3wun88t4b",
+     "label": "Espresso",
+     "ml": 30,
+     "ts": "2026-09-11T05:41:50.735Z",
+     "preset": "espresso"
+    },
+    {
+     "id": "mtwj6w38uqj3a",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-11T05:44:09.716Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtwlguu6hlt0i",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-11T06:47:53.886Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtwlh81br3ge4",
+     "label": "Intra",
+     "ml": 700,
+     "ts": "2026-09-11T06:48:10.991Z",
+     "preset": "mtv5tmu9rl95u"
+    },
+    {
+     "id": "mtwnti2thtioi",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-11T07:53:43.109Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtwntk1ydnh16",
+     "label": "Doppio",
+     "ml": 80,
+     "ts": "2026-09-11T07:53:45.670Z",
+     "preset": "doppio"
+    },
+    {
+     "id": "mtwpdx7xvii80",
+     "label": "Monster / Cola Zero",
+     "ml": 500,
+     "ts": "2026-09-11T08:37:35.469Z",
+     "preset": "drink"
+    },
+    {
+     "id": "mtwzlheycw1m1",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-11T13:23:24.394Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtx1j1gqdxsn8",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-11T14:17:29.642Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtx6lizvrhq7f",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-11T16:39:23.755Z",
+     "preset": "shake"
+    },
+    {
+     "id": "mtxdw22zbrohy",
+     "label": "Wasser",
+     "ml": 140,
+     "ts": "2026-09-11T20:03:32.363Z",
+     "preset": null
+    }
+   ]
+  },
+  "2026-09-13": {
+   "date": "2026-09-13",
+   "updatedAt": "2026-09-12T17:29:31.419Z",
+   "saltG": 7.2,
    "entries": []
   }
  }
