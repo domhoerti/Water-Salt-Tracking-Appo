@@ -403,7 +403,7 @@ details.panel[open]>summary::after{content:"–"}
 (function(){
   "use strict";
 
-  var APP_VERSION = "2.1";
+  var APP_VERSION = "2.2";
   var TAGE_VORAUS = 31;          // so weit lässt sich vorausplanen
 
   /* ================= Modell ================= */
@@ -995,6 +995,7 @@ details.panel[open]>summary::after{content:"–"}
           throw {kurz:"Keine Verbindung",
                  msg:"GitHub ist nicht erreichbar. Bist du online? Im Flugmodus oder ohne Empfang kann die App sich nicht verbinden."};
         }
+        if(r.status === 404) throw await diagnose404(owner, repo);
         if(!r.ok) throw err(r);
         var info = await r.json();
         conf.branch = info.default_branch || "main";
@@ -1017,6 +1018,44 @@ details.panel[open]>summary::after{content:"–"}
         ghMsg((e && e.msg) || "Verbindung fehlgeschlagen.", true);
         return false;
       }
+    }
+
+    /* Ein 404 sagt nicht, WAS fehlt. Also den Schlüssel selbst befragen:
+       Zu wem gehört er, und welche Repos darf er überhaupt sehen? */
+    async function diagnose404(owner, repo){
+      var allgemein = err({status:404});
+      try{
+        var ru = await api("/user");
+        if(!ru.ok) return allgemein;
+        var user = await ru.json();
+
+        if(user.login && user.login.toLowerCase() !== owner.toLowerCase()){
+          return {kurz:"Falscher Benutzername",
+            msg:"Der Schlüssel gehört zum Benutzer \u201e" + user.login + "\u201c, du hast aber \u201e" + owner +
+                "\u201c eingetragen. Trag " + user.login + " als Benutzername ein."};
+        }
+
+        var rr = await api("/user/repos?per_page=100&affiliation=owner");
+        if(!rr.ok) return allgemein;
+        var liste = (await rr.json()).map(function(x){ return x.name; });
+
+        if(!liste.length){
+          return {kurz:"Schlüssel ohne Repo", msg:
+            "Der Schlüssel ist gültig, hat aber auf KEIN einziges Repo Zugriff. Das passiert, wenn beim Erstellen unter " +
+            "\u201eRepository access\u201c die Voreinstellung \u201ePublic repositories\u201c stehen geblieben ist – die reicht für ein " +
+            "privates Repo nicht. Erzeug den Schlüssel neu und wähl dort \u201eOnly select repositories\u201c mit " + repo + "."};
+        }
+        var treffer = liste.filter(function(n){ return n.toLowerCase() === repo.toLowerCase(); })[0];
+        if(treffer && treffer !== repo){
+          return {kurz:"Schreibweise", msg:
+            "Das Repo heißt genau \u201e" + treffer + "\u201c, du hast \u201e" + repo +
+            "\u201c eingetragen. Groß- und Kleinschreibung zählt – trag " + treffer + " ein."};
+        }
+        return {kurz:"Repo nicht freigegeben", msg:
+          "Der Schlüssel ist gültig, darf aber nicht auf \u201e" + repo + "\u201c zugreifen. Freigegeben ist: " +
+          liste.slice(0, 8).join(", ") + (liste.length > 8 ? " und weitere" : "") +
+          ". Entweder heißt dein Datenrepo anders, oder du musst es beim Schlüssel unter \u201eRepository access\u201c auswählen."};
+      }catch(e){ return allgemein; }
     }
 
     function ghMsg(text, fehler){
