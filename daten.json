@@ -1,0 +1,64 @@
+{
+ "app": "wasser-salz",
+ "version": 1,
+ "savedAt": "2026-09-12T18:26:21.705Z",
+ "cfg": {
+  "targetWater": 4000,
+  "targetSalt": 10,
+  "targetsSet": false,
+  "updatedAt": "1970-01-01T00:00:00.000Z",
+  "backupEveryDays": 3,
+  "presets": [
+   {
+    "id": "shake",
+    "label": "Shake",
+    "ml": 700,
+    "perDay": 0
+   },
+   {
+    "id": "drink",
+    "label": "Monster / Cola Zero",
+    "ml": 500,
+    "perDay": 0
+   },
+   {
+    "id": "glass",
+    "label": "Glas Wasser",
+    "ml": 330,
+    "perDay": 0
+   },
+   {
+    "id": "doppio",
+    "label": "Doppio",
+    "ml": 80,
+    "perDay": 0
+   },
+   {
+    "id": "espresso",
+    "label": "Espresso",
+    "ml": 30,
+    "perDay": 0
+   },
+   {
+    "id": "porridge",
+    "label": "Porridge",
+    "ml": 250,
+    "perDay": 2
+   },
+   {
+    "id": "rice",
+    "label": "Reis",
+    "ml": 150,
+    "perDay": 1
+   }
+  ]
+ },
+ "days": {
+  "2026-09-12": {
+   "date": "2026-09-12",
+   "updatedAt": "1970-01-01T00:00:00.000Z",
+   "saltG": null,
+   "entries": []
+  }
+ }
+}
