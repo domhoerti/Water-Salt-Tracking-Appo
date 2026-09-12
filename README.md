@@ -68,30 +68,37 @@ in Google Sheets importierbar über *Datei › Importieren*):
 Werden in Safari die Website-Daten gelöscht, sind die Einträge weg — also ab und
 zu eine Sicherung speichern.
 
-## Synchronisierung (optional)
+## Sicherung und Abgleich über GitHub (optional)
 
-Ohne Einrichtung läuft die App rein lokal. Mit einem Gratis-Projekt bei
-[Supabase](https://supabase.com) gleicht sie sich über alle Geräte ab und ist
-damit auch gesichert:
+Ohne Einrichtung läuft die App rein lokal. Verbunden mit einem **privaten**
+Repository sichert sie sich nach jeder Änderung selbst und gleicht sich über
+alle Geräte ab:
 
-1. Bei Supabase ein Projekt anlegen.
-2. `supabase/schema.sql` im **SQL Editor** einfügen und ausführen. Legt zwei
-   Tabellen an und schaltet Row Level Security ein.
-3. Unter *Authentication › URL Configuration* die **Site URL** auf
-   `https://domhoerti.github.io/Water-Salt-Tracking-Appo/` setzen.
-4. In `config.js` die **Project URL** und den **anon public** Schlüssel
-   eintragen.
-
-In der App dann unter *Einstellungen › Synchronisierung* die E-Mail eintragen,
-Link antippen, fertig. Kein Passwort.
-
-Beide Werte in `config.js` sind für den Browser gedacht und dürfen öffentlich
-stehen — die Daten schützt Row Level Security in der Datenbank, nicht die
-Geheimhaltung des Schlüssels. Der `service_role`-Schlüssel gehört **niemals**
-in dieses Repository: der umgeht RLS.
+1. Auf GitHub ein **privates** Repo anlegen, z. B. `wasser-salz-daten`.
+   Leer genügt, die App legt `daten.json` selbst an.
+2. Einen Schlüssel erzeugen: *Settings › Developer settings › Personal access
+   tokens › **Fine-grained tokens***. Nur dieses eine Repo auswählen,
+   Berechtigung **Contents: Read and write**, sonst nichts. Eine Ablauffrist
+   setzen.
+3. In der App unter *Einstellungen › Sicherung über GitHub* Benutzername,
+   Repo-Name und Schlüssel eintragen, **Verbinden**.
 
 Der Abgleich ist offline-first: gearbeitet wird immer lokal, bei Verbindung
-werden Tage in beide Richtungen abgeglichen, der jüngere Zeitstempel gewinnt.
+werden Tage in beide Richtungen zusammengeführt, der jüngere Zeitstempel
+gewinnt. Schreibt ein zweites Gerät gleichzeitig, wird neu gelesen und erneut
+zusammengeführt.
+
+### Zum Schlüssel
+
+Er liegt im `localStorage` des jeweiligen Geräts und landet **nie** im
+Repository. Zwei Dinge dazu:
+
+- `localStorage` gilt pro Herkunft, nicht pro Unterordner. Jede andere Seite
+  unter `domhoerti.github.io` könnte ihn auslesen. Deshalb der Hinweis oben:
+  den Schlüssel ausschließlich auf das eine Datenrepo berechtigen, damit im
+  schlimmsten Fall nur die Trinkdaten betroffen sind.
+- *Trennen* in den Einstellungen löscht ihn vom Gerät. Auf GitHub lässt er
+  sich jederzeit widerrufen.
 
 ## Dateien
 
@@ -101,8 +108,6 @@ werden Tage in beide Richtungen abgeglichen, der jüngere Zeitstempel gewinnt.
 | `manifest.webmanifest` | Name, Icon, Vollbildmodus |
 | `sw.js` | Service Worker, macht die App offlinefähig |
 | `icons/` | App-Icons (inkl. Quell-SVG) |
-| `config.js` | Zugangsdaten für die Synchronisierung (leer = rein lokal) |
-| `supabase/schema.sql` | Tabellen und Sicherheitsregeln für Supabase |
 
 Keine Abhängigkeiten, kein Build-Schritt. Einzige externe Ressource sind die
 Schriften (IBM Plex) von Google Fonts; die legt der Service Worker beim ersten

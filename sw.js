@@ -1,5 +1,5 @@
 /* Wasser & Salz – Offline-Cache */
-const VERSION = "wasser-salz-v7";
+const VERSION = "wasser-salz-v8";
 const SHELL = [
   "./",
   "./index.html",

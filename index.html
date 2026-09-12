@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Tages-Tracker für Trinkmenge und Salz">
 <link rel="manifest" href="manifest.webmanifest">
-<script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Wasser & Salz">
@@ -138,6 +136,10 @@ header{display:flex;flex-direction:column;gap:9px}
 .saltfree .btn{background:transparent;color:var(--salt);border:1px solid var(--line);padding:8px 12px;white-space:nowrap}
 .saltfree .btn:hover{border-color:var(--salt)}
 .hint{font-size:12.5px;color:var(--muted)}
+.syncform{display:flex;flex-direction:column;gap:7px}
+.syncform input{background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:9px 10px;width:100%}
+.syncform .btn{align-self:flex-start}
+code{font-family:"IBM Plex Mono",monospace;font-size:.92em;background:var(--surface-2);padding:1px 4px;border-radius:4px}
 
 /* ---------- Kacheln ---------- */
 .sect{display:flex;flex-direction:column;gap:10px}
@@ -346,26 +348,28 @@ details.panel[open]>summary::after{content:"–"}
         <p class="hint" style="margin:8px 0 0">Semikolon-getrennt, direkt in Google Sheets importierbar (Datei › Importieren).</p>
       </div>
       <div id="syncBox" hidden>
-        <div class="subhead" style="margin-bottom:8px">Synchronisierung</div>
+        <div class="subhead" style="margin-bottom:8px">Sicherung über GitHub</div>
         <div id="syncOut">
-          <p class="hint" style="margin:0 0 8px">Anmelden, damit deine Daten gesichert sind und auf allen Geräten gleich stehen. Du bekommst einen Link per E-Mail, kein Passwort nötig.</p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-            <input id="syncMail" type="email" inputmode="email" autocomplete="email" placeholder="deine@mail.at"
-                   style="flex:1;min-width:160px;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:8px 9px">
-            <button class="btn" id="syncLogin">Link schicken</button>
+          <p class="hint" style="margin:0 0 9px">Ein <b>privates</b> Repo verbinden: Die App legt dort nach jeder Änderung <code>daten.json</code> ab. Damit sind deine Daten gesichert und auf allen Geräten gleich. Der Zugriffsschlüssel bleibt auf diesem Gerät und landet nie im Repo.</p>
+          <div class="syncform">
+            <input id="ghOwner" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="GitHub-Benutzername" aria-label="GitHub-Benutzername">
+            <input id="ghRepo" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Name des privaten Repos" aria-label="Repo-Name">
+            <input id="ghToken" type="password" autocomplete="off" placeholder="github_pat_…" aria-label="Zugriffsschlüssel">
+            <button class="btn" id="ghConnect">Verbinden</button>
           </div>
+          <p class="hint" style="margin:9px 0 0">Schlüssel erzeugen: GitHub → <i>Settings</i> → <i>Developer settings</i> → <i>Personal access tokens</i> → <b>Fine-grained tokens</b>. Nur dieses eine Repo auswählen, Berechtigung <b>Contents: Read and write</b>, sonst nichts.</p>
         </div>
         <div id="syncIn" hidden>
-          <p class="hint" style="margin:0 0 8px">Angemeldet als <b id="syncWho"></b><br><span id="syncWhen"></span></p>
+          <p class="hint" style="margin:0 0 8px">Verbunden mit <b id="syncWho"></b><br><span id="syncWhen"></span></p>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn--ghost" id="syncNow">Jetzt abgleichen</button>
-            <button class="btn btn--ghost" id="syncOff">Abmelden</button>
+            <button class="btn btn--ghost" id="syncOff">Trennen</button>
           </div>
         </div>
       </div>
       <div>
         <div class="subhead" style="margin-bottom:8px">Sicherung</div>
-        <p class="hint" style="margin:0 0 8px">Deine Daten liegen nur auf diesem Gerät. Sichere sie ab und zu – dann geht nichts verloren, wenn das iPhone mal neu aufgesetzt wird.</p>
+        <p class="hint" style="margin:0 0 8px">Eine Sicherungsdatei zum Mitnehmen – unabhängig vom Abgleich. Praktisch beim Gerätewechsel oder wenn du die Zahlen woanders auswerten willst.</p>
         <div class="field" style="margin-bottom:10px">
           <label for="bkInt">Erinnerung alle … Tage (0 = aus)</label>
           <input id="bkInt" type="number" min="0" max="99" step="1" inputmode="numeric">
@@ -395,7 +399,7 @@ details.panel[open]>summary::after{content:"–"}
 (function(){
   "use strict";
 
-  var APP_VERSION = "1.3";
+  var APP_VERSION = "2.0";
   var TAGE_VORAUS = 31;          // so weit lässt sich vorausplanen
 
   /* ================= Modell ================= */
@@ -838,170 +842,203 @@ details.panel[open]>summary::after{content:"–"}
 
   function render(){ renderHeader(); renderGauges(); renderTiles(); renderTimeline(); renderWeek(); renderBanner(); renderBackupTip(); }
 
-  /* ================= Synchronisierung (Supabase) =================
-     Offline-first: localStorage bleibt der Arbeitsspeicher. Der Abgleich
-     schiebt Tage in beide Richtungen, jüngerer Zeitstempel gewinnt. */
+  /* ========= Sicherung und Abgleich über ein privates GitHub-Repo =========
+     Offline-first: localStorage bleibt der Arbeitsspeicher, der Abgleich
+     läuft nebenher. Eine einzige Datei (daten.json) hält Einstellungen und alle Tage.
+     Zusammengeführt wird je Tag über updatedAt: der jüngere Stand gewinnt.
+     Der Zugriffsschlüssel liegt nur im Speicher dieses Geräts, nie im Repo. */
   var Sync = (function(){
-    var sb = null, session = null, dirtyDays = {}, dirtyCfg = false, timer = null, busy = false;
+    var LS_CONF = "ws.gh", LS_LAST = "ws.ghLast";
+    var conf = null;      // {owner, repo, path, branch, token}
+    var sha = null;       // Stand der Datei auf GitHub
+    var timer = null, busy = false, lastAt = null, lastErr = null;
 
-    function cfgOk(){
-      var c = window.WS_CONFIG || {};
-      return !!(c.supabaseUrl && c.supabaseAnonKey);
+    function active(){ return !!conf; }
+
+    function api(path, opts){
+      opts = opts || {};
+      return fetch("https://api.github.com" + path, {
+        method: opts.method || "GET",
+        headers: {
+          "Authorization": "Bearer " + conf.token,
+          "Accept": "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+          "Content-Type": "application/json"
+        },
+        body: opts.body ? JSON.stringify(opts.body) : undefined,
+        cache: "no-store"
+      });
     }
-    function online(){ return navigator.onLine !== false; }
-    function active(){ return !!(sb && session); }
+    function err(r){
+      if(r.status === 401) return {msg:"Schlüssel ungültig oder abgelaufen"};
+      if(r.status === 403) return {msg:"Zugriff verweigert – Rechte des Schlüssels prüfen"};
+      if(r.status === 404) return {msg:"Repo nicht gefunden oder Schlüssel ohne Zugriff"};
+      if(r.status === 429) return {msg:"Zu viele Anfragen – später nochmal"};
+      return {msg:"GitHub meldet Fehler " + r.status};
+    }
+
+    /* Base64 über TextEncoder, sonst zerbrechen Umlaute in den Bezeichnungen. */
+    function b64enc(str){
+      var b = new TextEncoder().encode(str), s = "";
+      for(var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+      return btoa(s);
+    }
+    function b64dec(x){
+      var s = atob(String(x).replace(/\s/g, ""));
+      var b = new Uint8Array(s.length);
+      for(var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i);
+      return new TextDecoder("utf-8").decode(b);
+    }
 
     function status(){
-      if(!cfgOk()){ setSync("auf diesem Gerät"); return; }
-      if(!session){ setSync("nicht angemeldet"); return; }
-      setSync(online() ? (busy ? "gleicht ab …" : "synchronisiert") : "offline");
-      renderSyncUi();
+      if(!active()) return setSync("nur auf diesem Gerät");
+      if(!navigator.onLine) return setSync("offline");
+      if(busy) return setSync("gleicht ab …");
+      if(lastErr) return setSync(lastErr.length > 22 ? "Sync-Fehler" : lastErr);
+      setSync(lastAt ? "gesichert " + hhmm(lastAt) : "verbunden");
     }
 
-    async function init(){
-      if(!cfgOk()){ status(); return; }
-      // supabase.js kommt per defer – kurz darauf warten.
-      for(var i = 0; i < 40 && !window.supabase; i++) await new Promise(function(r){ setTimeout(r, 100); });
-      if(!window.supabase){ setSync(online() ? "Sync nicht ladbar" : "offline"); return; }
-      sb = window.supabase.createClient(window.WS_CONFIG.supabaseUrl, window.WS_CONFIG.supabaseAnonKey, {
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-      });
-      var got = await sb.auth.getSession();
-      session = got.data ? got.data.session : null;
-      sb.auth.onAuthStateChange(function(_e, s){
-        session = s;
-        status(); renderSyncUi();
-        if(s) full();
-      });
-      status(); renderSyncUi();
-      if(session) full();
-      window.addEventListener("online", function(){ status(); if(active()) full(); });
-      window.addEventListener("offline", status);
+    async function pull(){
+      var r = await api("/repos/" + conf.owner + "/" + conf.repo + "/contents/" +
+                        conf.path + "?ref=" + encodeURIComponent(conf.branch));
+      if(r.status === 404){ sha = null; return null; }
+      if(!r.ok) throw err(r);
+      var j = await r.json();
+      sha = j.sha;
+      try{ return JSON.parse(b64dec(j.content)); }catch(e){ return null; }
     }
 
-    async function sendLink(email){
-      if(!sb) return showToast("Sync ist nicht eingerichtet.");
-      var res = await sb.auth.signInWithOtp({
-        email: email,
-        options: { emailRedirectTo: location.origin + location.pathname }
-      });
-      if(res.error) showToast("Ging nicht: " + res.error.message);
-      else showToast("Link ist unterwegs an " + email + ".");
-    }
-    async function signOut(){
-      if(!sb) return;
-      await sb.auth.signOut();
-      session = null; status(); renderSyncUi();
-      showToast("Abgemeldet. Die Daten bleiben auf diesem Gerät.");
-    }
-
-    function rowToDay(r){
-      return normDay(r.date, {
-        date: r.date,
-        saltG: r.salt_g == null ? null : Number(r.salt_g),
-        entries: r.entries || [],
-        updatedAt: r.updated_at
-      });
-    }
-    function dayToRow(d){
-      return { user_id: session.user.id, date: d.date, salt_g: d.saltG,
-               entries: d.entries, updated_at: d.updatedAt };
+    async function push(msg){
+      var days = {};
+      Object.keys(dayCache).forEach(function(d){ days[d] = dayCache[d]; });
+      var body = {
+        message: msg,
+        content: b64enc(JSON.stringify({app:"wasser-salz", version:1,
+                  savedAt:new Date().toISOString(), cfg:cfg, days:days}, null, 1)),
+        branch: conf.branch
+      };
+      if(sha) body.sha = sha;
+      var r = await api("/repos/" + conf.owner + "/" + conf.repo + "/contents/" + conf.path,
+                        {method:"PUT", body:body});
+      if(r.status === 409 || r.status === 422) return "konflikt";
+      if(!r.ok) throw err(r);
+      var j = await r.json();
+      sha = (j.content && j.content.sha) || null;
+      return "ok";
     }
 
-    async function full(){
-      if(!active() || !online() || busy) return;
-      busy = true; status();
+    /* Jüngerer Zeitstempel gewinnt – je Tag einzeln, nicht für den ganzen Bestand. */
+    function mergeIn(remote){
+      if(!remote) return false;
+      var geaendert = false;
+      if(remote.cfg){
+        var rc = normCfg(remote.cfg);
+        if(rc.updatedAt > cfg.updatedAt){ cfg = rc; lsSet(LS_CFG, cfg); geaendert = true; }
+      }
+      var rd = remote.days || {};
+      Object.keys(rd).forEach(function(date){
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+        var r = normDay(date, rd[date]), l = dayCache[date];
+        if(!l || r.updatedAt > l.updatedAt){
+          dayCache[date] = r; lsSet(LS_DAY + date, r); lsTouch(date); geaendert = true;
+        }
+      });
+      return geaendert;
+    }
+
+    async function full(leise){
+      if(!active() || busy) return;
+      if(!navigator.onLine){ status(); return; }
+      busy = true; lastErr = null; status();
       try{
-        var res = await sb.from("tracker_days").select("date,salt_g,entries,updated_at");
-        if(res.error) throw res.error;
-        var remote = {}, changed = false;
-        (res.data || []).forEach(function(r){ remote[r.date] = r; });
-
-        // Fernstand übernehmen, wo er jünger ist
-        Object.keys(remote).forEach(function(date){
-          var inc = rowToDay(remote[date]);
-          var loc = dayCache[date];
-          if(!loc || inc.updatedAt > loc.updatedAt){
-            dayCache[date] = inc; lsSet(LS_DAY+date, inc); lsTouch(date); changed = true;
-          }
-        });
-        // eigenen Stand hochschieben, wo er jünger ist
-        var push = Object.keys(dayCache).filter(function(date){
-          var r = remote[date];
-          return !r || dayCache[date].updatedAt > r.updated_at;
-        }).map(function(date){ return dayToRow(dayCache[date]); });
-        if(push.length){
-          var up = await sb.from("tracker_days").upsert(push, { onConflict: "user_id,date" });
-          if(up.error) throw up.error;
+        var geaendert = mergeIn(await pull());
+        var res = await push("Abgleich " + new Date().toISOString());
+        if(res === "konflikt"){
+          geaendert = mergeIn(await pull()) || geaendert;
+          res = await push("Abgleich nach gleichzeitiger Änderung");
         }
-
-        // Einstellungen
-        var cs = await sb.from("tracker_settings").select("config,updated_at").maybeSingle();
-        if(cs.error) throw cs.error;
-        if(cs.data && cs.data.updated_at > cfg.updatedAt){
-          cfg = normCfg(cs.data.config); lsSet(LS_CFG, cfg); changed = true;
-        } else if(!cs.data || cfg.updatedAt > cs.data.updated_at){
-          var cu = await sb.from("tracker_settings").upsert(
-            { user_id: session.user.id, config: cfg, updated_at: cfg.updatedAt },
-            { onConflict: "user_id" });
-          if(cu.error) throw cu.error;
-        }
-
-        dirtyDays = {}; dirtyCfg = false;
-        lsSet("ws.lastSync", new Date().toISOString());
-        if(changed){ render(); renderSettings(true); }
+        lastAt = new Date().toISOString();
+        lsSet(LS_LAST, lastAt);
+        markBackup();
+        if(geaendert){ render(); }
+        renderSettings(true);
+        if(!leise) showToast("Abgeglichen.");
       }catch(e){
-        showToast("Abgleich fehlgeschlagen: " + (e.message || e.code || "unbekannt"));
-      }finally{ busy = false; status(); renderSyncUi(); }
+        lastErr = (e && e.msg) || "Abgleich fehlgeschlagen";
+        if(!leise) showToast(lastErr);
+      }
+      busy = false; status(); renderUi();
     }
 
-    async function flush(){
-      if(!active() || !online()) return;
-      var dates = Object.keys(dirtyDays);
-      if(!dates.length && !dirtyCfg) return;
-      try{
-        if(dates.length){
-          var rows = dates.filter(function(d){ return dayCache[d]; }).map(function(d){ return dayToRow(dayCache[d]); });
-          var up = await sb.from("tracker_days").upsert(rows, { onConflict: "user_id,date" });
-          if(up.error) throw up.error;
-          dirtyDays = {};
-        }
-        if(dirtyCfg){
-          var cu = await sb.from("tracker_settings").upsert(
-            { user_id: session.user.id, config: cfg, updated_at: cfg.updatedAt }, { onConflict: "user_id" });
-          if(cu.error) throw cu.error;
-          dirtyCfg = false;
-        }
-        lsSet("ws.lastSync", new Date().toISOString());
-        renderSyncUi();
-      }catch(e){ setSync("Abgleich offen"); }
-    }
     function schedule(){
+      if(!active()) return;
       clearTimeout(timer);
-      timer = setTimeout(function(){ flush(); }, 1200);
+      timer = setTimeout(function(){ full(true); }, 4000);
     }
 
-    function renderSyncUi(){
+    async function connectRepo(owner, repo, token){
+      conf = {owner:owner, repo:repo, token:token, branch:"main", path:"daten.json"};
+      busy = true; lastErr = null; status();
+      try{
+        var r = await api("/repos/" + owner + "/" + repo);
+        if(!r.ok) throw err(r);
+        var info = await r.json();
+        conf.branch = info.default_branch || "main";
+        if(info.permissions && info.permissions.push === false) throw {msg:"Schlüssel darf nicht schreiben"};
+        lsSet(LS_CONF, conf);
+        busy = false;
+        if(!info.private) showToast("Achtung: Dieses Repo ist öffentlich – deine Daten wären für jeden lesbar.");
+        await full(true);
+        return true;
+      }catch(e){
+        conf = null; busy = false;
+        lastErr = (e && e.msg) || "Verbindung fehlgeschlagen";
+        status(); renderUi(); showToast(lastErr);
+        return false;
+      }
+    }
+
+    function disconnect(){
+      conf = null; sha = null; lastAt = null; lastErr = null;
+      clearTimeout(timer);
+      try{ localStorage.removeItem(LS_CONF); localStorage.removeItem(LS_LAST); }catch(e){}
+      status(); renderUi();
+      showToast("Getrennt. Der Zugriffsschlüssel wurde von diesem Gerät gelöscht.");
+    }
+
+    function renderUi(){
       var box = $("syncBox");
       if(!box) return;
-      box.hidden = !cfgOk();
-      if(!cfgOk()) return;
-      $("syncOut").hidden = !!session;
-      $("syncIn").hidden = !session;
-      if(session){
-        $("syncWho").textContent = session.user.email || "angemeldet";
-        var last = lsGet("ws.lastSync");
-        $("syncWhen").textContent = last
-          ? "Zuletzt abgeglichen: " + new Date(last).toLocaleString("de-AT", {dateStyle:"medium", timeStyle:"short"})
+      box.hidden = false;
+      $("syncOut").hidden = active();
+      $("syncIn").hidden = !active();
+      if(active()){
+        $("syncWho").textContent = conf.owner + "/" + conf.repo;
+        var l = lastAt || lsGet(LS_LAST);
+        $("syncWhen").textContent = l
+          ? "Zuletzt abgeglichen: " + new Date(l).toLocaleString("de-AT", {dateStyle:"medium", timeStyle:"short"})
           : "Noch nicht abgeglichen.";
       }
     }
 
+    function init(){
+      var c = lsGet(LS_CONF);
+      conf = (c && c.token && c.owner && c.repo) ? c : null;
+      lastAt = lsGet(LS_LAST);
+      status(); renderUi();
+      if(active()) full(true);
+      window.addEventListener("online",  function(){ status(); if(active()) full(true); });
+      window.addEventListener("offline", status);
+      document.addEventListener("visibilitychange", function(){
+        if(!document.hidden && active()) full(true);
+      });
+    }
+
     return {
-      init: init, full: full, sendLink: sendLink, signOut: signOut,
-      renderUi: renderSyncUi, configured: cfgOk,
-      queueDay: function(date){ if(active()){ dirtyDays[date] = true; schedule(); } },
-      queueCfg: function(){ if(active()){ dirtyCfg = true; schedule(); } }
+      init: init, full: full, renderUi: renderUi,
+      connectRepo: connectRepo, disconnect: disconnect, isActive: active,
+      queueDay: function(){ schedule(); },
+      queueCfg: function(){ schedule(); }
     };
   })();
 
@@ -1270,14 +1307,19 @@ details.panel[open]>summary::after{content:"–"}
   }));
   $("csvEntries").addEventListener("click", safe(function(){ download("wasser-salz-eintraege.csv", csvEntries()); }));
   $("csvDays").addEventListener("click", safe(function(){ download("wasser-salz-tage.csv", csvDays()); }));
-  $("syncLogin").addEventListener("click", safe(function(){
-    var mail = $("syncMail").value.trim();
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)){ showToast("Bitte eine gültige E-Mail-Adresse."); return; }
-    Sync.sendLink(mail);
+  $("ghConnect").addEventListener("click", safe(function(){
+    var owner = $("ghOwner").value.trim().replace(/^@/, "");
+    var repo  = $("ghRepo").value.trim().replace(/\.git$/, "");
+    var token = $("ghToken").value.trim();
+    if(repo.indexOf("/") > -1){ var pp = repo.split("/"); owner = pp[0]; repo = pp[1]; }
+    if(!owner || !repo || !token){ showToast("Benutzername, Repo und Schlüssel ausfüllen."); return; }
+    Sync.connectRepo(owner, repo, token).then(function(ok){
+      if(ok){ $("ghToken").value = ""; showToast("Verbunden und abgeglichen."); }
+    });
   }));
-  $("syncMail").addEventListener("keydown", safe(function(e){ if(e.key === "Enter"){ e.preventDefault(); $("syncLogin").click(); } }));
+  $("ghToken").addEventListener("keydown", safe(function(e){ if(e.key === "Enter"){ e.preventDefault(); $("ghConnect").click(); } }));
   $("syncNow").addEventListener("click", safe(function(){ Sync.full(); }));
-  $("syncOff").addEventListener("click", safe(function(){ Sync.signOut(); }));
+  $("syncOff").addEventListener("click", safe(function(){ Sync.disconnect(); }));
 
   $("backupSave").addEventListener("click", safe(backupJson));
   $("backupNow").addEventListener("click", safe(backupJson));
@@ -1297,7 +1339,7 @@ details.panel[open]>summary::after{content:"–"}
     if(iOS && !standalone && !lsGet("ws.tipHidden")) $("installTip").hidden = false;
     if(standalone) setSync("App");
     $("installDismiss").addEventListener("click", safe(function(){ lsSet("ws.tipHidden", true); $("installTip").hidden = true; }));
-    $("ver").textContent = "Version " + APP_VERSION + " · Daten bleiben auf diesem Gerät";
+    $("ver").textContent = "Version " + APP_VERSION;
   })();
 
   if("serviceWorker" in navigator){
