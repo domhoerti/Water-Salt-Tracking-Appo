@@ -127,8 +127,16 @@ header{display:flex;flex-direction:column;gap:12px}
 .saltinput input{width:74px;border:0;background:transparent;font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:500;text-align:right}
 .saltinput input:focus{outline:none}
 .saltinput span{color:var(--muted);font-size:13px}
-.stepbtn{background:var(--surface);border:1px solid var(--line);border-radius:8px;height:38px;padding:0 12px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
-.stepbtn:hover{border-color:var(--line-strong);color:var(--ink)}
+.saltsteps{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.saltsteps button{border:0;border-left:1px solid var(--line);background:transparent;height:38px;
+  padding:0 9px;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:12.5px;white-space:nowrap}
+.saltsteps button:first-child{border-left:0}
+.saltsteps button:hover,.saltsteps button:active{background:var(--salt-soft);color:var(--salt-ink)}
+.saltfree{display:flex;align-items:center;gap:7px;margin-top:8px}
+.saltfree input{width:122px;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;
+  padding:8px 9px;font-family:"IBM Plex Mono",monospace;text-align:right}
+.saltfree .btn{background:transparent;color:var(--salt);border:1px solid var(--line);padding:8px 12px;white-space:nowrap}
+.saltfree .btn:hover{border-color:var(--salt)}
 .hint{font-size:12.5px;color:var(--muted)}
 
 /* ---------- Kacheln ---------- */
@@ -272,8 +280,17 @@ details.panel[open]>summary::after{content:"–"}
             <input id="saltIn" type="text" inputmode="decimal" autocomplete="off" placeholder="0,0" aria-label="Salz in Gramm">
             <span>g</span>
           </div>
-          <button class="stepbtn" data-salt="-1">−1</button>
-          <button class="stepbtn" data-salt="1">+1</button>
+          <div class="saltsteps">
+            <button type="button" data-salt="-1">−1</button>
+            <button type="button" data-salt="-0.1">−0,1</button>
+            <button type="button" data-salt="0.1">+0,1</button>
+            <button type="button" data-salt="1">+1</button>
+          </div>
+        </div>
+        <div class="saltfree">
+          <input id="sfG" type="text" inputmode="decimal" autocomplete="off" placeholder="z. B. 2,35" aria-label="Salz dazuzählen in Gramm">
+          <span class="hint">g</span>
+          <button type="button" class="btn" id="sfAdd">dazuzählen</button>
         </div>
       </div>
     </div>
@@ -378,7 +395,7 @@ details.panel[open]>summary::after{content:"–"}
 (function(){
   "use strict";
 
-  var APP_VERSION = "1.1";
+  var APP_VERSION = "1.2";
   var TAGE_VORAUS = 31;          // so weit lässt sich vorausplanen
 
   /* ================= Modell ================= */
@@ -414,6 +431,11 @@ details.panel[open]>summary::after{content:"–"}
   function fromIso(s){ var p=String(s).split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
   function shiftIso(s,n){ var d=fromIso(s); d.setDate(d.getDate()+n); return toIso(d); }
   function nf(n){ return Math.round(Number(n)||0).toLocaleString("de-AT"); }
+  /* Salz: eine Nachkommastelle, zwei nur wenn nötig (7,7 g · 2,35 g). */
+  function nfS(n){
+    return (Math.round((Number(n)||0)*100)/100)
+      .toLocaleString("de-AT", {minimumFractionDigits:1, maximumFractionDigits:2});
+  }
   function nf1(n){ return (Math.round((Number(n)||0)*10)/10).toLocaleString("de-AT",{minimumFractionDigits:1,maximumFractionDigits:1}); }
   function hhmm(ts){ var d=new Date(ts); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
   function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
@@ -634,7 +656,7 @@ details.panel[open]>summary::after{content:"–"}
     var ts = cfg.targetSalt;
     var s = d.saltG;
     var si = $("saltIn");
-    if(document.activeElement !== si) si.value = (s == null ? "" : String(s).replace(".", ","));
+    if(document.activeElement !== si) si.value = (s == null ? "" : nfS(s));
     var sp = (ts && s) ? Math.min(100, s/ts*100) : 0;
     $("sFill").style.width = sp+"%";
     $("sEdge").style.left = "calc("+sp+"% - 1px)";
@@ -643,10 +665,10 @@ details.panel[open]>summary::after{content:"–"}
     var diff = ts - (s||0);
     sr.className = diff < 0 ? "over" : "";
     sr.textContent = !ts ? "kein Ziel gesetzt"
-      : s == null ? "noch nichts eingetragen · Ziel " + nf1(ts) + " g"
-      : diff > 0 ? "noch " + nf1(diff) + " g"
-      : "Ziel erreicht" + (diff < 0 ? " · " + nf1(-diff) + " g darüber" : "");
-    $("sNa").textContent = s ? nf1(s*0.393) + " g Natrium" : "";
+      : s == null ? "noch nichts eingetragen · Ziel " + nfS(ts) + " g"
+      : diff > 0 ? "noch " + nfS(diff) + " g"
+      : "Ziel erreicht" + (diff < 0 ? " · " + nfS(-diff) + " g darüber" : "");
+    $("sNa").textContent = s ? nfS(s*0.393) + " g Natrium" : "";
   }
 
   function renderTiles(){
@@ -1131,7 +1153,7 @@ details.panel[open]>summary::after{content:"–"}
       var val = Number(String(c[iVal]).replace(",", "."));
       if(!isFinite(val)) return;
       var kat = (iKat > -1 ? c[iKat] : "Wasser").toLowerCase();
-      if(kat.indexOf("salz") === 0){ out[date].saltG = Math.round(val*10)/10; return; }
+      if(kat.indexOf("salz") === 0){ out[date].saltG = Math.round(val*100)/100; return; }
       var hm = String(iTime > -1 ? c[iTime] : "").split(":");
       var when = fromIso(date);
       when.setHours(hm.length === 2 ? +hm[0] : 12, hm.length === 2 ? +hm[1] : 0, 0, 0);
@@ -1183,20 +1205,36 @@ details.panel[open]>summary::after{content:"–"}
     }
     var v = clean.replace(",", ".");
     var d = day(cur);
-    d.saltG = (v === "" || v === "." || isNaN(Number(v))) ? null : Math.max(0, Math.round(Number(v)*10)/10);
+    d.saltG = (v === "" || v === "." || isNaN(Number(v))) ? null : Math.max(0, Math.round(Number(v)*100)/100);
     renderGauges(); renderWeek();
   }));
   saltIn.addEventListener("change", safe(function(){ saveDay(cur); }));
   saltIn.addEventListener("blur", safe(function(){ saveDay(cur); renderGauges(); }));
 
+  /* Auf zwei Nachkommastellen runden, sonst driften 0,1er-Schritte (7,7 + 0,1 = 7,800000000000001). */
+  function addSalt(delta){
+    var d = day(cur);
+    d.saltG = Math.max(0, Math.round((((d.saltG||0) + delta))*100)/100);
+    lastUndo = null;
+    saveDay(cur); render();
+    return d.saltG;
+  }
   Array.prototype.forEach.call(document.querySelectorAll("[data-salt]"), function(b){
-    b.addEventListener("click", safe(function(){
-      var d = day(cur);
-      d.saltG = Math.max(0, Math.round(((d.saltG||0) + Number(b.getAttribute("data-salt")))*10)/10);
-      lastUndo = null;
-      saveDay(cur); render();
-    }));
+    b.addEventListener("click", safe(function(){ addSalt(Number(b.getAttribute("data-salt"))); }));
   });
+
+  function addSaltFree(){
+    var el = $("sfG");
+    var v = Number(String(el.value).replace(",", "."));
+    if(!isFinite(v) || v === 0){ el.focus(); showToast("Bitte eine Salzmenge in g eintragen."); return; }
+    var neu = addSalt(v);
+    showToast((v > 0 ? "+" : "−") + nfS(Math.abs(v)) + " g Salz · jetzt " + nfS(neu) + " g");
+    el.value = "";
+  }
+  $("sfAdd").addEventListener("click", safe(addSaltFree));
+  $("sfG").addEventListener("keydown", safe(function(e){
+    if(e.key === "Enter"){ e.preventDefault(); addSaltFree(); }
+  }));
 
   function addFree(){
     var mlEl = $("ffMl"), lbEl = $("ffLabel");
