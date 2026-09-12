@@ -372,6 +372,11 @@ details.panel[open]>summary::after{content:"–"}
         </div>
       </div>
       <div>
+        <div class="subhead" style="margin-bottom:8px">Fassung</div>
+        <p class="hint" id="verInfo" style="margin:0 0 8px"></p>
+        <button class="btn btn--ghost" id="updCheck">Nach Update suchen</button>
+      </div>
+      <div>
         <div class="subhead" style="margin-bottom:8px">Sicherung</div>
         <p class="hint" style="margin:0 0 8px">Eine Sicherungsdatei zum Mitnehmen – unabhängig vom Abgleich. Praktisch beim Gerätewechsel oder wenn du die Zahlen woanders auswerten willst.</p>
         <div class="field" style="margin-bottom:10px">
@@ -403,7 +408,7 @@ details.panel[open]>summary::after{content:"–"}
 (function(){
   "use strict";
 
-  var APP_VERSION = "2.2";
+  var APP_VERSION = "2.3";
   var TAGE_VORAUS = 31;          // so weit lässt sich vorausplanen
 
   /* ================= Modell ================= */
@@ -1431,6 +1436,45 @@ details.panel[open]>summary::after{content:"–"}
     $("installDismiss").addEventListener("click", safe(function(){ lsSet("ws.tipHidden", true); $("installTip").hidden = true; }));
     $("ver").textContent = "Version " + APP_VERSION;
   })();
+
+  /* iOS behält die installierte App zäh im Cache. Darum selbst nachsehen,
+     ob auf dem Server eine neuere Fassung liegt, und dann hart neu laden. */
+  async function pruefeUpdate(manuell){
+    if(!navigator.onLine){
+      if(manuell) showToast("Offline – Update lässt sich nicht prüfen.");
+      return;
+    }
+    try{
+      var r = await fetch("version.json?t=" + Date.now(), {cache:"no-store"});
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      var j = await r.json();
+      if(!j || !j.version) return;
+      if(j.version === APP_VERSION){
+        if(manuell) showToast("Du hast die neueste Fassung (" + APP_VERSION + ").");
+        return;
+      }
+      var marke = "ws.upd." + j.version;
+      if(!manuell){
+        try{ if(sessionStorage.getItem(marke)) return; sessionStorage.setItem(marke, "1"); }catch(e){}
+      }
+      showToast("Neue Fassung " + j.version + " wird geladen …");
+      try{
+        var keys = await caches.keys();
+        for(var i = 0; i < keys.length; i++) await caches.delete(keys[i]);
+      }catch(e){}
+      try{
+        var regs = await navigator.serviceWorker.getRegistrations();
+        for(var k = 0; k < regs.length; k++){ try{ await regs[k].update(); }catch(e){} }
+      }catch(e){}
+      setTimeout(function(){ location.reload(); }, 900);
+    }catch(e){
+      if(manuell) showToast("Update-Prüfung fehlgeschlagen.");
+    }
+  }
+  $("verInfo").textContent = "Installiert: Version " + APP_VERSION;
+  $("updCheck").addEventListener("click", safe(function(){ pruefeUpdate(true); }));
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) pruefeUpdate(false); });
+  setTimeout(function(){ pruefeUpdate(false); }, 2500);
 
   if("serviceWorker" in navigator){
     window.addEventListener("load", function(){

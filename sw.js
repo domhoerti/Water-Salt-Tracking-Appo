@@ -1,5 +1,5 @@
 /* Wasser & Salz – Offline-Cache */
-const VERSION = "wasser-salz-v10";
+const VERSION = "wasser-salz-v11";
 const SHELL = [
   "./",
   "./index.html",
@@ -31,6 +31,9 @@ self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+
+  // Die Versionsdatei nie aus dem Cache – sie entscheidet ja über den Cache.
+  if (url.pathname.endsWith("/version.json")) return;
 
   // Schriften und die Sync-Bibliothek: erst Cache, sonst Netz und dann ablegen.
   if (url.hostname.endsWith("googleapis.com") || url.hostname.endsWith("gstatic.com")

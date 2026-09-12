@@ -115,9 +115,23 @@ Start ab, danach läuft alles offline.
 
 ## Aktualisieren
 
-`index.html` ändern, in `sw.js` die Zeile `const VERSION = "wasser-salz-v1"`
-hochzählen, committen und pushen. Die App holt sich die neue Fassung beim
-nächsten Start mit Internetverbindung.
+`index.html` ändern, dann **drei** Stellen hochzählen, sonst kommt das Update
+nicht am iPhone an:
+
+1. `APP_VERSION` in `index.html`
+2. `VERSION` in `sw.js`
+3. `version.json`
+
+Beim Start und bei jeder Rückkehr in die App vergleicht sie `version.json` mit
+ihrer eigenen `APP_VERSION`. Weicht sie ab, leert sie ihre Caches und lädt neu.
+Das ist nötig, weil die installierte App auf iOS einen eigenen, zähen Cache
+hat, den ein Update in Safari nicht erreicht. `version.json` läuft im Service
+Worker bewusst am Cache vorbei — sie entscheidet ja über den Cache.
+
+Ein Marker in `sessionStorage` sorgt dafür, dass je Fassung und Sitzung höchstens
+einmal neu geladen wird; ohne ihn liefe die App bei einem Fehler in einer
+Neulade-Schleife.
+
 
 ## Lokal ausprobieren
 
