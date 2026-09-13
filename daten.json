@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-13T11:04:24.146Z",
+ "savedAt": "2026-09-13T11:04:50.361Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -419,8 +419,8 @@
   },
   "2026-09-13": {
    "date": "2026-09-13",
-   "updatedAt": "2026-09-13T10:42:34.914Z",
-   "saltG": 7.9,
+   "updatedAt": "2026-09-13T11:04:45.980Z",
+   "saltG": 8.7,
    "entries": [
     {
      "id": "mtzcrvkma3fwe",
