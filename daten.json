@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-16T08:56:09.023Z",
+ "savedAt": "2026-09-16T08:56:17.102Z",
  "cfg": {
   "targetWater": 9000,
   "targetSalt": 9,
@@ -776,7 +776,7 @@
   },
   "2026-09-16": {
    "date": "2026-09-16",
-   "updatedAt": "2026-09-16T08:56:04.618Z",
+   "updatedAt": "2026-09-16T08:56:12.752Z",
    "saltG": null,
    "entries": [
     {
@@ -858,9 +858,9 @@
     },
     {
      "id": "mu3v8ydluewqd",
-     "label": "Monster / Cola Zero",
+     "label": "Gönnergy",
      "ml": 500,
-     "ts": "2026-09-16T08:56:04.617Z",
+     "ts": "2026-09-16T08:56:00.000Z",
      "preset": "drink"
     }
    ]
