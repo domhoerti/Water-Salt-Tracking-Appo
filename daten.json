@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-16T06:28:10.455Z",
+ "savedAt": "2026-09-16T06:28:21.028Z",
  "cfg": {
   "targetWater": 9000,
   "targetSalt": 9,
@@ -776,7 +776,7 @@
   },
   "2026-09-16": {
    "date": "2026-09-16",
-   "updatedAt": "2026-09-16T05:52:05.382Z",
+   "updatedAt": "2026-09-16T06:28:16.694Z",
    "saltG": null,
    "entries": [
     {
@@ -833,6 +833,13 @@
      "label": "wasser porridge 3",
      "ml": 450,
      "ts": "2026-09-16T05:52:05.382Z",
+     "preset": null
+    },
+    {
+     "id": "mu3pyvudo35hn",
+     "label": "almdudler",
+     "ml": 340,
+     "ts": "2026-09-16T06:28:16.693Z",
      "preset": null
     }
    ]
