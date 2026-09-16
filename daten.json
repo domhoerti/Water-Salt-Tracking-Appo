@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-16T07:12:11.388Z",
+ "savedAt": "2026-09-16T07:12:24.471Z",
  "cfg": {
   "targetWater": 9000,
   "targetSalt": 9,
@@ -776,7 +776,7 @@
   },
   "2026-09-16": {
    "date": "2026-09-16",
-   "updatedAt": "2026-09-16T06:28:16.694Z",
+   "updatedAt": "2026-09-16T07:12:20.204Z",
    "saltG": null,
    "entries": [
     {
@@ -840,6 +840,13 @@
      "label": "almdudler",
      "ml": 340,
      "ts": "2026-09-16T06:28:16.693Z",
+     "preset": null
+    },
+    {
+     "id": "mu3rjjl70h76n",
+     "label": "cola zero",
+     "ml": 300,
+     "ts": "2026-09-16T07:12:20.203Z",
      "preset": null
     }
    ]
