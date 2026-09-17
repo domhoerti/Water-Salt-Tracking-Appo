@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-17T17:28:32.746Z",
+ "savedAt": "2026-09-17T17:29:35.338Z",
  "cfg": {
   "targetWater": 9000,
   "targetSalt": 9,
@@ -916,7 +916,7 @@
   },
   "2026-09-17": {
    "date": "2026-09-17",
-   "updatedAt": "2026-09-17T13:20:51.682Z",
+   "updatedAt": "2026-09-17T17:29:30.903Z",
    "saltG": 6.5,
    "entries": [
     {
@@ -1030,6 +1030,13 @@
      "ml": 700,
      "ts": "2026-09-17T13:18:43.285Z",
      "preset": "shake"
+    },
+    {
+     "id": "mu5t13bpcljrf",
+     "label": "almdudler",
+     "ml": 405,
+     "ts": "2026-09-17T17:29:30.901Z",
+     "preset": null
     }
    ]
   },
