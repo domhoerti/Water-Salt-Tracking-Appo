@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-17T09:24:21.808Z",
+ "savedAt": "2026-09-17T09:24:35.551Z",
  "cfg": {
   "targetWater": 9000,
   "targetSalt": 9,
@@ -916,7 +916,7 @@
   },
   "2026-09-17": {
    "date": "2026-09-17",
-   "updatedAt": "2026-09-17T09:02:11.824Z",
+   "updatedAt": "2026-09-17T09:24:31.149Z",
    "saltG": 6.5,
    "entries": [
     {
@@ -994,6 +994,13 @@
      "label": "eistee",
      "ml": 330,
      "ts": "2026-09-17T09:02:11.824Z",
+     "preset": null
+    },
+    {
+     "id": "mu5bpdt9av3ao",
+     "label": "gönnergy",
+     "ml": 500,
+     "ts": "2026-09-17T09:24:31.149Z",
      "preset": null
     }
    ]
