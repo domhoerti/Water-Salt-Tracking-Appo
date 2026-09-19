@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-19T15:28:48.043Z",
+ "savedAt": "2026-09-19T15:28:55.209Z",
  "cfg": {
   "targetWater": 6000,
   "targetSalt": 9,
@@ -1154,7 +1154,7 @@
   },
   "2026-09-19": {
    "date": "2026-09-19",
-   "updatedAt": "2026-09-19T15:28:43.598Z",
+   "updatedAt": "2026-09-19T15:28:50.709Z",
    "saltG": 5,
    "entries": [
     {
@@ -1197,6 +1197,13 @@
      "label": "400 ml wasser",
      "ml": 400,
      "ts": "2026-09-19T15:28:43.597Z",
+     "preset": null
+    },
+    {
+     "id": "mu8jlm39uete4",
+     "label": "gatorade",
+     "ml": 500,
+     "ts": "2026-09-19T15:28:50.709Z",
      "preset": null
     }
    ]
