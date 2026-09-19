@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-19T15:28:36.341Z",
+ "savedAt": "2026-09-19T15:28:48.043Z",
  "cfg": {
   "targetWater": 6000,
   "targetSalt": 9,
@@ -1154,7 +1154,7 @@
   },
   "2026-09-19": {
    "date": "2026-09-19",
-   "updatedAt": "2026-09-19T15:26:02.247Z",
+   "updatedAt": "2026-09-19T15:28:43.598Z",
    "saltG": 5,
    "entries": [
     {
@@ -1191,6 +1191,13 @@
      "ml": 500,
      "ts": "2026-09-19T15:26:02.246Z",
      "preset": "drink"
+    },
+    {
+     "id": "mu8jlglp5c6iu",
+     "label": "400 ml wasser",
+     "ml": 400,
+     "ts": "2026-09-19T15:28:43.597Z",
+     "preset": null
     }
    ]
   }
