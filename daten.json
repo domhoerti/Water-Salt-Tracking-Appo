@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-20T14:02:34.235Z",
+ "savedAt": "2026-09-20T14:02:47.231Z",
  "cfg": {
   "targetWater": 6000,
   "targetSalt": 9,
@@ -1231,7 +1231,7 @@
   },
   "2026-09-20": {
    "date": "2026-09-20",
-   "updatedAt": "2026-09-20T13:48:19.168Z",
+   "updatedAt": "2026-09-20T14:02:42.885Z",
    "saltG": 6.3,
    "entries": [
     {
@@ -1282,6 +1282,13 @@
      "ml": 500,
      "ts": "2026-09-20T13:48:19.167Z",
      "preset": "drink"
+    },
+    {
+     "id": "mu9vyp8k6lim0",
+     "label": "cola zero",
+     "ml": 500,
+     "ts": "2026-09-20T14:02:42.884Z",
+     "preset": null
     }
    ]
   }
