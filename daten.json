@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-24T11:03:31.061Z",
+ "savedAt": "2026-09-24T11:03:41.263Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -1679,7 +1679,7 @@
   },
   "2026-09-24": {
    "date": "2026-09-24",
-   "updatedAt": "2026-09-24T08:49:33.161Z",
+   "updatedAt": "2026-09-24T11:03:36.789Z",
    "saltG": 8.2,
    "entries": [
     {
@@ -1744,6 +1744,13 @@
      "ml": 30,
      "ts": "2026-09-24T08:49:33.160Z",
      "preset": "espresso"
+    },
+    {
+     "id": "muffbs5w1gchq",
+     "label": "gönnergy",
+     "ml": 500,
+     "ts": "2026-09-24T11:03:36.788Z",
+     "preset": null
     }
    ]
   }
