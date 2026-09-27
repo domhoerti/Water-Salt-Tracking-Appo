@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-27T10:34:08.829Z",
+ "savedAt": "2026-09-27T10:34:15.782Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -2036,7 +2036,7 @@
   },
   "2026-09-27": {
    "date": "2026-09-27",
-   "updatedAt": "2026-09-27T10:34:04.377Z",
+   "updatedAt": "2026-09-27T10:34:11.305Z",
    "saltG": 7.7,
    "entries": [
     {
@@ -2094,6 +2094,13 @@
      "ml": 80,
      "ts": "2026-09-27T10:34:04.375Z",
      "preset": "doppio"
+    },
+    {
+     "id": "mujolhwoweg09",
+     "label": "cola zero",
+     "ml": 350,
+     "ts": "2026-09-27T10:34:11.304Z",
+     "preset": null
     }
    ]
   }
