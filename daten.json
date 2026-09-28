@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-28T04:38:50.839Z",
+ "savedAt": "2026-09-28T04:38:58.069Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -2148,8 +2148,8 @@
   },
   "2026-09-28": {
    "date": "2026-09-28",
-   "updatedAt": "2026-09-28T04:38:38.554Z",
-   "saltG": 7.7,
+   "updatedAt": "2026-09-28T04:38:53.468Z",
+   "saltG": 8.7,
    "entries": [
     {
      "id": "mukrc2pa32nhd",
