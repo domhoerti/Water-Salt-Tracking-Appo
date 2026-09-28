@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-28T04:38:36.755Z",
+ "savedAt": "2026-09-28T04:38:42.956Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -2148,7 +2148,7 @@
   },
   "2026-09-28": {
    "date": "2026-09-28",
-   "updatedAt": "2026-09-28T04:38:36.719Z",
+   "updatedAt": "2026-09-28T04:38:38.554Z",
    "saltG": 7.7,
    "entries": [
     {
@@ -2157,6 +2157,20 @@
      "ml": 250,
      "ts": "2026-09-28T04:38:36.718Z",
      "preset": "porridge"
+    },
+    {
+     "id": "mukrc3svxgr2x",
+     "label": "Doppio",
+     "ml": 80,
+     "ts": "2026-09-28T04:38:38.143Z",
+     "preset": "doppio"
+    },
+    {
+     "id": "mukrc44as7e9c",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-09-28T04:38:38.554Z",
+     "preset": "shake"
     }
    ]
   }
