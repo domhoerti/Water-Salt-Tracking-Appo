@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-28T15:40:36.018Z",
+ "savedAt": "2026-09-28T15:40:47.203Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -2148,7 +2148,7 @@
   },
   "2026-09-28": {
    "date": "2026-09-28",
-   "updatedAt": "2026-09-28T15:27:23.730Z",
+   "updatedAt": "2026-09-28T15:40:42.668Z",
    "saltG": 8.7,
    "entries": [
     {
@@ -2231,8 +2231,8 @@
     {
      "id": "muleiez5ug0st",
      "label": "sprite",
-     "ml": 320,
-     "ts": "2026-09-28T15:27:23.729Z",
+     "ml": 470,
+     "ts": "2026-09-28T15:27:00.000Z",
      "preset": null
     }
    ]
