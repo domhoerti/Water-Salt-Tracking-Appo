@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-09-29T13:50:43.832Z",
+ "savedAt": "2026-09-29T13:50:49.535Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -2260,7 +2260,7 @@
   },
   "2026-09-29": {
    "date": "2026-09-29",
-   "updatedAt": "2026-09-29T10:59:15.367Z",
+   "updatedAt": "2026-09-29T13:50:44.920Z",
    "saltG": 7.9,
    "entries": [
     {
@@ -2339,6 +2339,13 @@
      "ml": 500,
      "ts": "2026-09-29T10:59:15.366Z",
      "preset": "drink"
+    },
+    {
+     "id": "mumqhz945yth8",
+     "label": "Doppio",
+     "ml": 80,
+     "ts": "2026-09-29T13:50:44.920Z",
+     "preset": "doppio"
     }
    ]
   }
