@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-01T04:49:09.633Z",
+ "savedAt": "2026-10-01T04:49:17.682Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -2498,9 +2498,17 @@
   },
   "2026-10-01": {
    "date": "2026-10-01",
-   "updatedAt": "1970-01-01T00:00:00.000Z",
+   "updatedAt": "2026-10-01T04:49:13.296Z",
    "saltG": null,
-   "entries": []
+   "entries": [
+    {
+     "id": "mup219w0dfhav",
+     "label": "reis",
+     "ml": 560,
+     "ts": "2026-10-01T04:49:13.296Z",
+     "preset": null
+    }
+   ]
   }
  }
 }
