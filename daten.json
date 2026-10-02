@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-02T09:25:42.969Z",
+ "savedAt": "2026-10-02T09:25:52.937Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -2603,7 +2603,7 @@
   },
   "2026-10-02": {
    "date": "2026-10-02",
-   "updatedAt": "2026-10-02T09:25:38.578Z",
+   "updatedAt": "2026-10-02T09:25:48.553Z",
    "saltG": 7,
    "entries": [
     {
@@ -2633,6 +2633,13 @@
      "ml": 80,
      "ts": "2026-10-02T09:25:38.578Z",
      "preset": "doppio"
+    },
+    {
+     "id": "muqrctjdyn6to",
+     "label": "wasser zum kaffee",
+     "ml": 150,
+     "ts": "2026-10-02T09:25:48.553Z",
+     "preset": null
     }
    ]
   }
