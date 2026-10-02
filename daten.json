@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-02T10:19:33.998Z",
+ "savedAt": "2026-10-02T10:19:48.199Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -2603,7 +2603,7 @@
   },
   "2026-10-02": {
    "date": "2026-10-02",
-   "updatedAt": "2026-10-02T09:25:48.553Z",
+   "updatedAt": "2026-10-02T10:19:43.625Z",
    "saltG": 7,
    "entries": [
     {
@@ -2639,6 +2639,13 @@
      "label": "wasser zum kaffee",
      "ml": 150,
      "ts": "2026-10-02T09:25:48.553Z",
+     "preset": null
+    },
+    {
+     "id": "muqta5qhdryrf",
+     "label": "cola zero",
+     "ml": 330,
+     "ts": "2026-10-02T10:19:43.625Z",
      "preset": null
     }
    ]
