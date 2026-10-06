@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-06T06:21:56.734Z",
+ "savedAt": "2026-10-06T06:22:02.242Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -3023,7 +3023,7 @@
   },
   "2026-10-06": {
    "date": "2026-10-06",
-   "updatedAt": "2026-10-06T04:26:13.982Z",
+   "updatedAt": "2026-10-06T06:21:57.654Z",
    "saltG": 7.6,
    "entries": [
     {
@@ -3046,6 +3046,13 @@
      "ml": 250,
      "ts": "2026-10-06T04:26:13.982Z",
      "preset": "porridge"
+    },
+    {
+     "id": "muwajspin94de",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-10-06T06:21:57.654Z",
+     "preset": "shake"
     }
    ]
   }
