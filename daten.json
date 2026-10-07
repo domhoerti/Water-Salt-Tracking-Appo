@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-07T17:22:57.002Z",
+ "savedAt": "2026-10-07T17:23:05.485Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -3247,9 +3247,17 @@
   },
   "2026-10-08": {
    "date": "2026-10-08",
-   "updatedAt": "2026-10-07T17:22:52.434Z",
-   "saltG": 7.5,
-   "entries": []
+   "updatedAt": "2026-10-07T17:23:05.296Z",
+   "saltG": 7.6,
+   "entries": [
+    {
+     "id": "muydlv4ezdg0d",
+     "label": "Porridge",
+     "ml": 250,
+     "ts": "2026-10-08T10:00:00.000Z",
+     "preset": "porridge"
+    }
+   ]
   }
  }
 }
