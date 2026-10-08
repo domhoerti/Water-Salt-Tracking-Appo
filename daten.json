@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-08T17:15:32.609Z",
+ "savedAt": "2026-10-08T17:23:35.788Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
