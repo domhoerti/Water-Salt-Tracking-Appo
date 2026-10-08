@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-08T18:00:01.227Z",
+ "savedAt": "2026-10-08T18:00:14.563Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -3254,7 +3254,7 @@
   },
   "2026-10-08": {
    "date": "2026-10-08",
-   "updatedAt": "2026-10-08T17:15:28.191Z",
+   "updatedAt": "2026-10-08T18:00:10.086Z",
    "saltG": 8.9,
    "entries": [
     {
@@ -3353,6 +3353,13 @@
      "label": "cola 0",
      "ml": 370,
      "ts": "2026-10-08T17:15:28.189Z",
+     "preset": null
+    },
+    {
+     "id": "muzudeg5fvczd",
+     "label": "gröbi",
+     "ml": 350,
+     "ts": "2026-10-08T18:00:10.085Z",
      "preset": null
     }
    ]
