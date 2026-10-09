@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-09T11:41:15.510Z",
+ "savedAt": "2026-10-09T11:41:30.541Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -3373,7 +3373,7 @@
   },
   "2026-10-09": {
    "date": "2026-10-09",
-   "updatedAt": "2026-10-09T11:41:11.043Z",
+   "updatedAt": "2026-10-09T11:41:25.978Z",
    "saltG": 7.4,
    "entries": [
     {
@@ -3431,6 +3431,13 @@
      "ml": 80,
      "ts": "2026-10-09T11:41:11.043Z",
      "preset": "doppio"
+    },
+    {
+     "id": "mv0wa72x58w8f",
+     "label": "Glas Wasser",
+     "ml": 120,
+     "ts": "2026-10-09T11:41:25.977Z",
+     "preset": null
     }
    ]
   }
