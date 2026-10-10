@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-10T14:14:03.999Z",
+ "savedAt": "2026-10-10T14:14:16.488Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -3499,7 +3499,7 @@
   },
   "2026-10-10": {
    "date": "2026-10-10",
-   "updatedAt": "2026-10-10T13:07:12.739Z",
+   "updatedAt": "2026-10-10T14:14:12.102Z",
    "saltG": 7.8,
    "entries": [
     {
@@ -3591,6 +3591,13 @@
      "label": "alm",
      "ml": 330,
      "ts": "2026-10-10T13:07:12.739Z",
+     "preset": null
+    },
+    {
+     "id": "mv2h6idi1lf4b",
+     "label": "cola+alm",
+     "ml": 440,
+     "ts": "2026-10-10T14:14:12.102Z",
      "preset": null
     }
    ]
