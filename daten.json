@@ -1,12 +1,12 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-11T13:08:33.945Z",
+ "savedAt": "2026-10-11T13:08:52.064Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
   "targetsSet": true,
-  "updatedAt": "2026-10-11T13:08:29.485Z",
+  "updatedAt": "2026-10-11T13:08:47.762Z",
   "backupEveryDays": 3,
   "presets": [
    {
@@ -59,8 +59,8 @@
    },
    {
     "id": "mv3u9uwd2dy5m",
-    "label": "Neu",
-    "ml": 250,
+    "label": "kl. Shaker",
+    "ml": 600,
     "perDay": 0
    }
   ]
