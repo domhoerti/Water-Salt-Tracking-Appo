@@ -1,12 +1,12 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-11T13:08:21.899Z",
+ "savedAt": "2026-10-11T13:08:33.945Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
   "targetsSet": true,
-  "updatedAt": "2026-09-21T19:52:00.006Z",
+  "updatedAt": "2026-10-11T13:08:29.485Z",
   "backupEveryDays": 3,
   "presets": [
    {
@@ -55,6 +55,12 @@
     "id": "mtv5tmu9rl95u",
     "label": "Intra",
     "ml": 700,
+    "perDay": 0
+   },
+   {
+    "id": "mv3u9uwd2dy5m",
+    "label": "Neu",
+    "ml": 250,
     "perDay": 0
    }
   ]
