@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-11T04:00:29.649Z",
+ "savedAt": "2026-10-11T04:00:37.694Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -3618,9 +3618,16 @@
   },
   "2026-10-11": {
    "date": "2026-10-11",
-   "updatedAt": "2026-10-10T17:18:53.585Z",
+   "updatedAt": "2026-10-11T04:00:33.180Z",
    "saltG": 7.8,
    "entries": [
+    {
+     "id": "mv3ap7do7i50m",
+     "label": "Espresso",
+     "ml": 30,
+     "ts": "2026-10-11T04:00:33.180Z",
+     "preset": "espresso"
+    },
     {
      "id": "mv2nrj5t6o5ky",
      "label": "Porridge",
