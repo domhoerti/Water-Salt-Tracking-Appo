@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-12T06:36:32.769Z",
+ "savedAt": "2026-10-12T06:36:44.720Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -3736,7 +3736,7 @@
   },
   "2026-10-12": {
    "date": "2026-10-12",
-   "updatedAt": "2026-10-12T04:10:11.324Z",
+   "updatedAt": "2026-10-12T06:36:40.236Z",
    "saltG": 9,
    "entries": [
     {
@@ -3766,6 +3766,13 @@
      "ml": 30,
      "ts": "2026-10-12T04:10:11.323Z",
      "preset": "espresso"
+    },
+    {
+     "id": "mv4vptpnlp46f",
+     "label": "Monster / Cola Zero",
+     "ml": 500,
+     "ts": "2026-10-12T06:36:40.235Z",
+     "preset": "drink"
     }
    ]
   }
