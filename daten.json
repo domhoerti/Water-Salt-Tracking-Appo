@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-13T18:47:44.590Z",
+ "savedAt": "2026-10-14T04:36:41.153Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -3971,6 +3971,12 @@
      "preset": "doppio"
     }
    ]
+  },
+  "2026-10-14": {
+   "date": "2026-10-14",
+   "updatedAt": "1970-01-01T00:00:00.000Z",
+   "saltG": null,
+   "entries": []
   }
  }
 }
