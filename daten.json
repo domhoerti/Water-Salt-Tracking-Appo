@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-15T12:20:06.259Z",
+ "savedAt": "2026-10-15T12:20:14.998Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -4093,7 +4093,7 @@
   },
   "2026-10-15": {
    "date": "2026-10-15",
-   "updatedAt": "2026-10-15T10:52:19.062Z",
+   "updatedAt": "2026-10-15T12:20:10.467Z",
    "saltG": 9,
    "entries": [
     {
@@ -4165,6 +4165,13 @@
      "ml": 30,
      "ts": "2026-10-15T10:52:19.061Z",
      "preset": "espresso"
+    },
+    {
+     "id": "mv9ib4o2tin7b",
+     "label": "eistee",
+     "ml": 500,
+     "ts": "2026-10-15T12:20:10.466Z",
+     "preset": null
     }
    ]
   }
