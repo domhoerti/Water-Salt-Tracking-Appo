@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-16T12:47:51.411Z",
+ "savedAt": "2026-10-16T12:47:56.050Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -4226,7 +4226,7 @@
   },
   "2026-10-16": {
    "date": "2026-10-16",
-   "updatedAt": "2026-10-16T12:47:46.909Z",
+   "updatedAt": "2026-10-16T12:47:51.531Z",
    "saltG": 9,
    "entries": [
     {
@@ -4277,6 +4277,13 @@
      "ml": 250,
      "ts": "2026-10-16T12:47:46.909Z",
      "preset": "porridge"
+    },
+    {
+     "id": "mvayql0rzbgg7",
+     "label": "tango",
+     "ml": 500,
+     "ts": "2026-10-16T12:47:51.531Z",
+     "preset": null
     }
    ]
   }
