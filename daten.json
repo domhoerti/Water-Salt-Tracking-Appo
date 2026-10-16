@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-16T18:40:04.282Z",
+ "savedAt": "2026-10-16T18:40:31.728Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -4226,7 +4226,7 @@
   },
   "2026-10-16": {
    "date": "2026-10-16",
-   "updatedAt": "2026-10-16T17:40:49.733Z",
+   "updatedAt": "2026-10-16T18:40:27.299Z",
    "saltG": 9,
    "entries": [
     {
@@ -4312,6 +4312,13 @@
      "ml": 500,
      "ts": "2026-10-16T17:40:49.732Z",
      "preset": "drink"
+    },
+    {
+     "id": "mvbbc0wyeon9g",
+     "label": "sludge",
+     "ml": 60,
+     "ts": "2026-10-16T18:40:27.298Z",
+     "preset": null
     }
    ]
   }
