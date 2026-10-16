@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-16T02:59:50.821Z",
+ "savedAt": "2026-10-16T12:47:46.649Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -4226,14 +4226,35 @@
   },
   "2026-10-16": {
    "date": "2026-10-16",
-   "updatedAt": "2026-10-16T02:59:46.183Z",
-   "saltG": 8,
+   "updatedAt": "2026-10-16T09:56:42.558Z",
+   "saltG": 9,
    "entries": [
     {
      "id": "mvadq5nmt3lb0",
      "label": "coffee",
      "ml": 120,
      "ts": "2026-10-16T02:59:39.682Z",
+     "preset": null
+    },
+    {
+     "id": "mvag743mpe613",
+     "label": "Monster / Cola Zero",
+     "ml": 500,
+     "ts": "2026-10-16T04:08:50.050Z",
+     "preset": "drink"
+    },
+    {
+     "id": "mvas732zuc7jh",
+     "label": "Monster / Cola Zero",
+     "ml": 500,
+     "ts": "2026-10-16T09:44:44.123Z",
+     "preset": "drink"
+    },
+    {
+     "id": "mvasmd20uvxpr",
+     "label": "tango zero",
+     "ml": 600,
+     "ts": "2026-10-16T09:56:36.888Z",
      "preset": null
     },
     {
