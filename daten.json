@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-17T06:40:29.150Z",
+ "savedAt": "2026-10-17T06:40:33.673Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -4331,8 +4331,8 @@
   },
   "2026-10-17": {
    "date": "2026-10-17",
-   "updatedAt": "2026-10-17T06:27:54.163Z",
-   "saltG": null,
+   "updatedAt": "2026-10-17T06:40:29.299Z",
+   "saltG": 1,
    "entries": [
     {
      "id": "mvbymt14kannz",
