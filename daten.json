@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-17T16:31:07.980Z",
+ "savedAt": "2026-10-17T17:30:28.317Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -4331,7 +4331,7 @@
   },
   "2026-10-17": {
    "date": "2026-10-17",
-   "updatedAt": "2026-10-17T16:23:05.638Z",
+   "updatedAt": "2026-10-17T16:31:09.764Z",
    "saltG": 2,
    "entries": [
     {
@@ -4416,6 +4416,13 @@
      "label": "pepsi",
      "ml": 300,
      "ts": "2026-10-17T16:23:05.638Z",
+     "preset": null
+    },
+    {
+     "id": "mvcm5ltwctg3z",
+     "label": "volvic",
+     "ml": 500,
+     "ts": "2026-10-17T16:31:09.764Z",
      "preset": null
     }
    ]
