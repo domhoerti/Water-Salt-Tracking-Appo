@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-17T08:52:32.965Z",
+ "savedAt": "2026-10-17T16:18:54.568Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -4331,8 +4331,8 @@
   },
   "2026-10-17": {
    "date": "2026-10-17",
-   "updatedAt": "2026-10-17T08:17:57.587Z",
-   "saltG": 1,
+   "updatedAt": "2026-10-17T15:32:05.643Z",
+   "saltG": 2,
    "entries": [
     {
      "id": "mvbymt14kannz",
@@ -4353,6 +4353,55 @@
      "label": "wasser",
      "ml": 60,
      "ts": "2026-10-17T08:17:57.587Z",
+     "preset": null
+    },
+    {
+     "id": "mvc9xaxhkd6av",
+     "label": "wasser",
+     "ml": 500,
+     "ts": "2026-10-17T10:48:46.997Z",
+     "preset": null
+    },
+    {
+     "id": "mvcba8rlh8t63",
+     "label": "wasser",
+     "ml": 270,
+     "ts": "2026-10-17T11:26:50.337Z",
+     "preset": null
+    },
+    {
+     "id": "mvcckriq2odaa",
+     "label": "tango",
+     "ml": 500,
+     "ts": "2026-10-17T12:03:00.000Z",
+     "preset": null
+    },
+    {
+     "id": "mvccli39ayclr",
+     "label": "wasser",
+     "ml": 500,
+     "ts": "2026-10-17T12:03:35.252Z",
+     "preset": null
+    },
+    {
+     "id": "mvci27p6h57jv",
+     "label": "kaffee",
+     "ml": 250,
+     "ts": "2026-10-17T14:36:33.018Z",
+     "preset": null
+    },
+    {
+     "id": "mvci2czscbps0",
+     "label": "Monster / Cola Zero",
+     "ml": 500,
+     "ts": "2026-10-17T14:36:39.880Z",
+     "preset": "drink"
+    },
+    {
+     "id": "mvck1n5ygpbuq",
+     "label": "pepsi",
+     "ml": 330,
+     "ts": "2026-10-17T15:32:05.638Z",
      "preset": null
     }
    ]
