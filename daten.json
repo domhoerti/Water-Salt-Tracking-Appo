@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-18T09:36:31.057Z",
+ "savedAt": "2026-10-18T11:05:26.616Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -4436,7 +4436,7 @@
   },
   "2026-10-18": {
    "date": "2026-10-18",
-   "updatedAt": "2026-10-18T09:36:30.488Z",
+   "updatedAt": "2026-10-18T11:05:21.256Z",
    "saltG": 2,
    "entries": [
     {
@@ -4473,6 +4473,13 @@
      "ml": 500,
      "ts": "2026-10-18T09:36:30.487Z",
      "preset": null
+    },
+    {
+     "id": "mvdpygrrxof7q",
+     "label": "Espresso",
+     "ml": 30,
+     "ts": "2026-10-18T11:05:21.255Z",
+     "preset": "espresso"
     }
    ]
   }
