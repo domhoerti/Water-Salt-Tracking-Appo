@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-18T06:12:26.881Z",
+ "savedAt": "2026-10-18T06:12:42.326Z",
  "cfg": {
   "targetWater": 6500,
   "targetSalt": 9,
@@ -4436,9 +4436,17 @@
   },
   "2026-10-18": {
    "date": "2026-10-18",
-   "updatedAt": "1970-01-01T00:00:00.000Z",
-   "saltG": null,
-   "entries": []
+   "updatedAt": "2026-10-18T06:12:37.820Z",
+   "saltG": 1,
+   "entries": [
+    {
+     "id": "mvdfhyxj6uhhh",
+     "label": "wasser sludge",
+     "ml": 70,
+     "ts": "2026-10-18T06:12:35.479Z",
+     "preset": null
+    }
+   ]
   }
  }
 }
