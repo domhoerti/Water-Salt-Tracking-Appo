@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-19T13:28:52.823Z",
+ "savedAt": "2026-10-19T13:29:02.759Z",
  "cfg": {
   "targetWater": 6100,
   "targetSalt": 9,
@@ -4485,7 +4485,7 @@
   },
   "2026-10-19": {
    "date": "2026-10-19",
-   "updatedAt": "2026-10-19T12:02:29.412Z",
+   "updatedAt": "2026-10-19T13:28:58.379Z",
    "saltG": 4,
    "entries": [
     {
@@ -4528,6 +4528,13 @@
      "label": "volvic",
      "ml": 200,
      "ts": "2026-10-19T11:50:38.922Z",
+     "preset": null
+    },
+    {
+     "id": "mvfaj0gajgd6u",
+     "label": "Wasser",
+     "ml": 700,
+     "ts": "2026-10-19T13:28:58.378Z",
      "preset": null
     }
    ]
