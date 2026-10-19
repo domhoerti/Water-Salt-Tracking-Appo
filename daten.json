@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-19T08:24:11.362Z",
+ "savedAt": "2026-10-19T08:24:24.436Z",
  "cfg": {
   "targetWater": 6100,
   "targetSalt": 9,
@@ -4485,7 +4485,7 @@
   },
   "2026-10-19": {
    "date": "2026-10-19",
-   "updatedAt": "2026-10-19T07:33:46.808Z",
+   "updatedAt": "2026-10-19T08:24:19.888Z",
    "saltG": 2,
    "entries": [
     {
@@ -4515,6 +4515,13 @@
      "ml": 500,
      "ts": "2026-10-19T07:33:46.808Z",
      "preset": "drink"
+    },
+    {
+     "id": "mvezn8ofqp4h1",
+     "label": "pepsi",
+     "ml": 330,
+     "ts": "2026-10-19T08:24:19.887Z",
+     "preset": null
     }
    ]
   }
