@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-20T09:21:22.588Z",
+ "savedAt": "2026-10-20T09:21:31.582Z",
  "cfg": {
   "targetWater": 6100,
   "targetSalt": 9,
@@ -4583,7 +4583,7 @@
   },
   "2026-10-20": {
    "date": "2026-10-20",
-   "updatedAt": "2026-10-20T07:18:07.907Z",
+   "updatedAt": "2026-10-20T09:21:27.230Z",
    "saltG": 8.4,
    "entries": [
     {
@@ -4627,6 +4627,13 @@
      "ml": 700,
      "ts": "2026-10-20T07:18:07.906Z",
      "preset": "shake"
+    },
+    {
+     "id": "mvgh4jwejmbd7",
+     "label": "tee",
+     "ml": 310,
+     "ts": "2026-10-20T09:21:27.230Z",
+     "preset": null
     }
    ]
   }
