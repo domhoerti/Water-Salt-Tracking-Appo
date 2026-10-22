@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-22T06:07:37.528Z",
+ "savedAt": "2026-10-22T06:07:50.807Z",
  "cfg": {
   "targetWater": 6100,
   "targetSalt": 9,
@@ -4807,9 +4807,30 @@
   },
   "2026-10-22": {
    "date": "2026-10-22",
-   "updatedAt": "2026-10-21T17:25:08.387Z",
+   "updatedAt": "2026-10-22T06:07:46.128Z",
    "saltG": 9,
    "entries": [
+    {
+     "id": "mvj534yg3kq24",
+     "label": "sludge",
+     "ml": 90,
+     "ts": "2026-10-22T06:07:44.344Z",
+     "preset": null
+    },
+    {
+     "id": "mvj535x4grctj",
+     "label": "Espresso",
+     "ml": 30,
+     "ts": "2026-10-22T06:07:45.592Z",
+     "preset": "espresso"
+    },
+    {
+     "id": "mvj536c0n5d45",
+     "label": "Shaker",
+     "ml": 700,
+     "ts": "2026-10-22T06:07:46.128Z",
+     "preset": "shake"
+    },
     {
      "id": "mviduegkgz1e5",
      "label": "Porridge",
