@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-25T19:35:34.951Z",
+ "savedAt": "2026-10-25T19:36:06.771Z",
  "cfg": {
   "targetWater": 6000,
   "targetSalt": 9,
@@ -5171,7 +5171,7 @@
   },
   "2026-10-25": {
    "date": "2026-10-25",
-   "updatedAt": "2026-10-25T19:35:30.590Z",
+   "updatedAt": "2026-10-25T19:36:02.177Z",
    "saltG": 9,
    "entries": [
     {
@@ -5289,8 +5289,8 @@
     {
      "id": "mvnzt8kv2yylv",
      "label": "cola zero amore",
-     "ml": 500,
-     "ts": "2026-10-25T15:38:55.279Z",
+     "ml": 330,
+     "ts": "2026-10-25T15:38:00.000Z",
      "preset": null
     }
    ]
