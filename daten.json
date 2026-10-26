@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-26T10:02:07.470Z",
+ "savedAt": "2026-10-26T10:02:15.832Z",
  "cfg": {
   "targetWater": 6000,
   "targetSalt": 9,
@@ -5297,7 +5297,7 @@
   },
   "2026-10-26": {
    "date": "2026-10-26",
-   "updatedAt": "2026-10-26T09:02:51.745Z",
+   "updatedAt": "2026-10-26T10:02:11.491Z",
    "saltG": 9,
    "entries": [
     {
@@ -5354,6 +5354,13 @@
      "label": "gönnergy",
      "ml": 500,
      "ts": "2026-10-26T09:02:51.744Z",
+     "preset": null
+    },
+    {
+     "id": "mvp381wjqj1so",
+     "label": "gröbi",
+     "ml": 323,
+     "ts": "2026-10-26T10:02:11.491Z",
      "preset": null
     }
    ]
