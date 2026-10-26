@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-26T05:49:01.132Z",
+ "savedAt": "2026-10-26T05:49:16.221Z",
  "cfg": {
   "targetWater": 6000,
   "targetSalt": 9,
@@ -5297,7 +5297,7 @@
   },
   "2026-10-26": {
    "date": "2026-10-26",
-   "updatedAt": "2026-10-26T05:48:56.747Z",
+   "updatedAt": "2026-10-26T05:49:11.891Z",
    "saltG": null,
    "entries": [
     {
@@ -5334,6 +5334,13 @@
      "ml": 80,
      "ts": "2026-10-26T05:48:56.746Z",
      "preset": "doppio"
+    },
+    {
+     "id": "mvou6p8y659ag",
+     "label": "Reiswasser",
+     "ml": 250,
+     "ts": "2026-10-26T05:49:11.890Z",
+     "preset": null
     }
    ]
   }
