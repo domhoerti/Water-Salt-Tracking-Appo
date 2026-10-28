@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-28T12:03:56.586Z",
+ "savedAt": "2026-10-28T13:14:04.719Z",
  "cfg": {
   "targetWater": 6000,
   "targetSalt": 9,
@@ -5542,7 +5542,7 @@
   },
   "2026-10-28": {
    "date": "2026-10-28",
-   "updatedAt": "2026-10-28T12:03:52.018Z",
+   "updatedAt": "2026-10-28T13:14:04.403Z",
    "saltG": null,
    "entries": [
     {
@@ -5607,6 +5607,20 @@
      "ml": 700,
      "ts": "2026-10-28T12:03:52.018Z",
      "preset": "shake"
+    },
+    {
+     "id": "mvs4yga5je1r6",
+     "label": "Espresso",
+     "ml": 30,
+     "ts": "2026-10-28T13:14:01.325Z",
+     "preset": "espresso"
+    },
+    {
+     "id": "mvs4yinnl80yx",
+     "label": "Monster / Cola Zero",
+     "ml": 500,
+     "ts": "2026-10-28T13:14:04.403Z",
+     "preset": "drink"
     }
    ]
   }
