@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-29T17:29:05.990Z",
+ "savedAt": "2026-10-29T17:29:17.119Z",
  "cfg": {
   "targetWater": 6000,
   "targetSalt": 9,
@@ -5782,6 +5782,20 @@
      "ml": 700,
      "ts": "2026-10-29T15:20:13.624Z",
      "preset": "shake"
+    }
+   ]
+  },
+  "2026-10-30": {
+   "date": "2026-10-30",
+   "updatedAt": "2026-10-29T17:29:12.808Z",
+   "saltG": null,
+   "entries": [
+    {
+     "id": "mvttihd2v4mua",
+     "label": "reiswasser",
+     "ml": 335,
+     "ts": "2026-10-30T11:00:00.000Z",
+     "preset": null
     }
    ]
   }
