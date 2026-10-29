@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-29T05:12:07.814Z",
+ "savedAt": "2026-10-29T05:12:24.586Z",
  "cfg": {
   "targetWater": 6000,
   "targetSalt": 9,
@@ -5675,9 +5675,45 @@
   },
   "2026-10-29": {
    "date": "2026-10-29",
-   "updatedAt": "1970-01-01T00:00:00.000Z",
-   "saltG": null,
-   "entries": []
+   "updatedAt": "2026-10-29T05:12:20.218Z",
+   "saltG": 9,
+   "entries": [
+    {
+     "id": "mvt36oqnnaszx",
+     "label": "reis",
+     "ml": 330,
+     "ts": "2026-10-29T05:12:12.479Z",
+     "preset": null
+    },
+    {
+     "id": "mvt36pwh6efck",
+     "label": "Porridge",
+     "ml": 250,
+     "ts": "2026-10-29T05:12:13.985Z",
+     "preset": "porridge"
+    },
+    {
+     "id": "mvt36qfpwwrd9",
+     "label": "Porridge",
+     "ml": 250,
+     "ts": "2026-10-29T05:12:14.677Z",
+     "preset": "porridge"
+    },
+    {
+     "id": "mvt36quxgnnuo",
+     "label": "Porridge",
+     "ml": 250,
+     "ts": "2026-10-29T05:12:15.225Z",
+     "preset": "porridge"
+    },
+    {
+     "id": "mvt36sobtnz84",
+     "label": "Doppio",
+     "ml": 80,
+     "ts": "2026-10-29T05:12:17.579Z",
+     "preset": "doppio"
+    }
+   ]
   }
  }
 }
