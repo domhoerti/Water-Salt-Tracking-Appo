@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-10-30T13:17:35.908Z",
+ "savedAt": "2026-10-30T14:09:37.111Z",
  "cfg": {
   "targetWater": 6000,
   "targetSalt": 9,
@@ -5801,7 +5801,7 @@
   },
   "2026-10-30": {
    "date": "2026-10-30",
-   "updatedAt": "2026-10-30T12:40:01.967Z",
+   "updatedAt": "2026-10-30T13:17:45.873Z",
    "saltG": 9,
    "entries": [
     {
@@ -5879,6 +5879,13 @@
      "label": "mineral",
      "ml": 500,
      "ts": "2026-10-30T12:40:01.967Z",
+     "preset": null
+    },
+    {
+     "id": "mvuzyyvkja845",
+     "label": "wasser kaffee",
+     "ml": 50,
+     "ts": "2026-10-30T13:17:45.872Z",
      "preset": null
     }
    ]
