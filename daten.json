@@ -1,7 +1,7 @@
 {
  "app": "wasser-salz",
  "version": 1,
- "savedAt": "2026-11-01T04:47:34.400Z",
+ "savedAt": "2026-11-01T12:27:07.189Z",
  "cfg": {
   "targetWater": 6000,
   "targetSalt": 9,
@@ -6053,7 +6053,7 @@
   },
   "2026-11-01": {
    "date": "2026-11-01",
-   "updatedAt": "2026-11-01T04:47:30.012Z",
+   "updatedAt": "2026-11-01T12:02:32.725Z",
    "saltG": null,
    "entries": [
     {
@@ -6068,6 +6068,34 @@
      "label": "tee",
      "ml": 250,
      "ts": "2026-11-01T04:47:30.012Z",
+     "preset": null
+    },
+    {
+     "id": "mvxqzauc2k6ml",
+     "label": "Porridge",
+     "ml": 250,
+     "ts": "2026-11-01T11:29:23.364Z",
+     "preset": "porridge"
+    },
+    {
+     "id": "mvxqzhotvkdan",
+     "label": "kaffee",
+     "ml": 200,
+     "ts": "2026-11-01T11:29:32.237Z",
+     "preset": null
+    },
+    {
+     "id": "mvxqzpvwkbgf1",
+     "label": "gato",
+     "ml": 250,
+     "ts": "2026-11-01T11:29:42.860Z",
+     "preset": null
+    },
+    {
+     "id": "mvxs5xucnppvv",
+     "label": "Glas Wasser",
+     "ml": 800,
+     "ts": "2026-11-01T12:02:32.723Z",
      "preset": null
     }
    ]
